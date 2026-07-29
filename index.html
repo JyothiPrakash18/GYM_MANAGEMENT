@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,8 +46,40 @@ body {
 }
 
   /* SIDEBAR */
-  .sidebar { width: 260px;
-    min-width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+ .sidebar{
+    width:260px;
+    min-width:260px;
+    background:var(--bg-sidebar);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    transition:.3s;
+    z-index:1000;
+}
+
+.menu-btn{
+    display:none;
+    background:none;
+    border:none;
+    font-size:24px;
+    cursor:pointer;
+    padding:4px;
+}
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    opacity:0;
+    visibility:hidden;
+    transition:.3s;
+    z-index:999;
+}
+
+.overlay.show{
+    opacity:1;
+    visibility:visible;
+}
 
   .sidebar-top { padding: 16px 14px 12px; border-bottom: 1px solid var(--border); }
   .gym-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
@@ -91,7 +122,11 @@ body {
 
   .content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
 
-  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.stat-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+}
   .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
   .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
   .stat-val { font-size: 22px; font-weight: 600; color: var(--text-primary); }
@@ -110,9 +145,57 @@ body {
 
   /* Plan tier colors for badge */
   .tier-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+  @media (max-width:768px){
+    .sidebar{
+        position:fixed;
+        left:-260px;
+        top:0;
+        bottom:0;
+    }
+
+    .sidebar.open{
+        left:0;
+    }
+
+    .menu-btn{
+        display:block;
+    }
+
+  .topbar{
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .plan-switcher{
+      display:flex;
+      width:100%;
+      overflow-x:auto;
+      gap:8px;
+      padding-top:8px;
+  }
+  
+  .plan-switcher::-webkit-scrollbar{
+      display:none;
+  }
+  
+  .plan-btn{
+      flex-shrink:0;
+  }
+
+    .stat-row{
+        grid-template-columns:1fr;
+    }
+
+    .module-preview{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
 </style>
 </head>
 <body>
+  <div class="overlay" id="overlay"></div>
 <div class="wrap">
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -133,6 +216,9 @@ body {
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
+      <button class="menu-btn" id="menuBtn">
+    ☰
+</button>
       <span class="topbar-title" id="topbar-title">Dashboard</span>
       <div class="plan-switcher">
         <button class="plan-btn active" onclick="setPlan('starter',this)">Starter</button>
@@ -241,7 +327,16 @@ function renderNav(planKey){
     div.className = 'nav-item' + (!ok ? ' locked' : '') + (isActive ? ' active' : '');
     div.title = !ok ? `Available on ${planNeeded(item.id)} plan` : item.label;
     div.innerHTML = `<span class="icon">${item.icon}</span><span class="label">${item.label}</span>${!ok ? '<span class="lock">🔒</span>' : ''}`;
-    if(ok) div.onclick = () => selectItem(item.id, item.label);
+    if(ok){
+    div.onclick = () => {
+        selectItem(item.id, item.label);
+
+        if(window.innerWidth <= 768){
+            sidebar.classList.remove("open");
+            overlay.classList.remove("show");
+        }
+    };
+}
     list.appendChild(div);
   });
 }
@@ -309,6 +404,30 @@ function showUpgrade(){
 renderNav('starter');
 renderBadge('starter');
 renderContent('dashboard');
+
+const sidebar=document.querySelector(".sidebar");
+const menuBtn=document.getElementById("menuBtn");
+const overlay=document.getElementById("overlay");
+
+menuBtn.onclick=()=>{
+    sidebar.classList.add("open");
+    overlay.classList.add("show");
+}
+
+overlay.onclick=()=>{
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+}
+
+window.addEventListener("resize", () => {
+    if(window.innerWidth > 768){
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+    }
+});
+
 </script>
 </body>
 </html>
+
+
