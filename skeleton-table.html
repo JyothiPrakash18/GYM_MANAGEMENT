@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Skeleton table loader</title>
+<style>
+  :root {
+    --surface-0: #ffffff;
+    --surface-1: #f0efeb;
+    --border: #e5e4df;
+  }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--surface-0);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .sk-table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .sk-row {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .sk-row:last-child {
+    border-bottom: none;
+  }
+  .sk-cell {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+  .sk-cell:last-child {
+    border-right: none;
+  }
+  .sk-header .sk-cell {
+    padding: 16px;
+    background: var(--surface-1);
+  }
+  .sk-shimmer {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-1);
+    border-radius: 6px;
+    height: 14px;
+    width: 100%;
+  }
+  .sk-header .sk-shimmer {
+    height: 12px;
+    background: #e2e0d8;
+  }
+  .sk-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: sk-shine 1.4s infinite;
+  }
+  @keyframes sk-shine {
+    100% { transform: translateX(100%); }
+  }
+</style>
+</head>
+<body>
+
+<div class="sk-table-wrap" id="sk-table"></div>
+
+<script>
+  const cols = 10;
+  const rows = 9;
+  const table = document.getElementById('sk-table');
+
+  // Header row
+  const header = document.createElement('div');
+  header.className = 'sk-row sk-header';
+  for (let c = 0; c < cols; c++) {
+    const cell = document.createElement('div');
+    cell.className = 'sk-cell';
+    const bar = document.createElement('div');
+    bar.className = 'sk-shimmer';
+    bar.style.width = (40 + Math.random() * 20) + 'px';
+    cell.appendChild(bar);
+    header.appendChild(cell);
+  }
+  table.appendChild(header);
+
+  // Body rows
+  for (let r = 0; r < rows; r++) {
+    const row = document.createElement('div');
+    row.className = 'sk-row';
+    for (let c = 0; c < cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'sk-cell';
+      const bar = document.createElement('div');
+      bar.className = 'sk-shimmer';
+      bar.style.width = (60 + Math.random() * 30) + '%';
+      cell.appendChild(bar);
+      row.appendChild(cell);
+    }
+    table.appendChild(row);
+  }
+</script>
+
+</body>
+</html>
