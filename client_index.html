@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -732,6 +731,80 @@ section {
   text-transform: uppercase;
 }
 
+/* ── BILLING TOGGLE ── */
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 44px;
+  background: white;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.billing-toggle button {
+  padding: 10px 22px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.billing-toggle button.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
+}
+
+.billing-toggle button:not(.active):hover {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+/* Savings badge on buttons */
+.save-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: #10b981;
+  color: white;
+  border-radius: 20px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 16px;
+}
+
+/* Price display animation */
+.price-amount {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.price-amount.switching {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Total billing note */
+.price-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  min-height: 18px;
+  transition: opacity 0.25s ease;
+}
+
 /* ── TESTIMONIALS ── */
 .testimonial .stars {
   color: #f59e0b;
@@ -1099,10 +1172,23 @@ footer p { color: #64748b; font-size: 14px; }
     <h2>Plans for Every Goal</h2>
     <p>No lock-ins. No surprises. Just results.</p>
   </div>
+
+  <!-- Billing Toggle -->
+  <div class="billing-toggle" id="billing-toggle">
+    <button class="active" data-plan="monthly">Monthly</button>
+    <button data-plan="quarterly">3 Months <span class="save-badge">10% off</span></button>
+    <button data-plan="biannual">6 Months <span class="save-badge">20% off</span></button>
+    <button data-plan="yearly">Yearly <span class="save-badge">30% off</span></button>
+  </div>
+
   <div class="pricing">
+    <!-- BASIC -->
     <div class="price">
       <h3>Basic</h3>
-      <h2>₹799<span style="font-size:16px;color:#888;font-weight:400">/mo</span></h2>
+      <h2 class="price-amount" id="price-basic">
+        ₹799<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
+      </h2>
+      <p class="price-note" id="note-basic"></p>
       <ul class="price-features">
         <li>Gym Floor Access</li>
         <li>Locker Room</li>
@@ -1111,9 +1197,14 @@ footer p { color: #64748b; font-size: 14px; }
       </ul>
       <a class="btn" href="#">Get Started</a>
     </div>
+
+    <!-- PRO -->
     <div class="price popular">
       <h3>Pro</h3>
-      <h2>₹1799<span style="font-size:16px;color:#888;font-weight:400">/mo</span></h2>
+      <h2 class="price-amount" id="price-pro">
+        ₹1799<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
+      </h2>
+      <p class="price-note" id="note-pro"></p>
       <ul class="price-features">
         <li>Everything in Basic</li>
         <li>Unlimited Group Classes</li>
@@ -1122,9 +1213,14 @@ footer p { color: #64748b; font-size: 14px; }
       </ul>
       <a class="btn" href="#">Get Started</a>
     </div>
+
+    <!-- ELITE -->
     <div class="price">
       <h3>Elite</h3>
-      <h2>₹3499<span style="font-size:16px;color:#888;font-weight:400">/mo</span></h2>
+      <h2 class="price-amount" id="price-elite">
+        ₹3499<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
+      </h2>
+      <p class="price-note" id="note-elite"></p>
       <ul class="price-features">
         <li>Everything in Pro</li>
         <li>Dedicated Personal Trainer</li>
@@ -1286,6 +1382,56 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 revealEls.forEach(el => observer.observe(el));
+
+// ── Billing toggle
+const plans = {
+  monthly:   { months: 1,  discount: 0 },
+  quarterly: { months: 3,  discount: 0.10 },
+  biannual:  { months: 6,  discount: 0.20 },
+  yearly:    { months: 12, discount: 0.30 }
+};
+
+const basePrices = { basic: 799, pro: 1799, elite: 3499 };
+
+const labels = { monthly: 'mo', quarterly: '3 mo', biannual: '6 mo', yearly: 'yr' };
+
+function updatePricing(planKey) {
+  const { months, discount } = plans[planKey];
+  const label = labels[planKey];
+
+  ['basic', 'pro', 'elite'].forEach(tier => {
+    const priceEl = document.getElementById('price-' + tier);
+    const noteEl  = document.getElementById('note-' + tier);
+    const base = basePrices[tier];
+    const monthly = Math.round(base * (1 - discount));
+    const total   = monthly * months;
+
+    // Animate out
+    priceEl.classList.add('switching');
+    setTimeout(() => {
+      if (planKey === 'monthly') {
+        priceEl.innerHTML = `₹${monthly.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/mo</span>`;
+        noteEl.textContent = '';
+      } else if (planKey === 'yearly') {
+        priceEl.innerHTML = `₹${total.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/yr</span>`;
+        noteEl.textContent = `₹${monthly.toLocaleString()}/mo · Save ₹${((base - monthly) * 12).toLocaleString()}`;
+      } else {
+        priceEl.innerHTML = `₹${total.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/${label}</span>`;
+        noteEl.textContent = `₹${monthly.toLocaleString()}/mo · Save ₹${((base - monthly) * months).toLocaleString()}`;
+      }
+      // Animate in
+      priceEl.classList.remove('switching');
+    }, 250);
+  });
+}
+
+document.getElementById('billing-toggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#billing-toggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePricing(btn.dataset.plan);
+});
 
 // ── Hero image tilt
 const heroImgWrap = document.getElementById('hero-image-wrap');
