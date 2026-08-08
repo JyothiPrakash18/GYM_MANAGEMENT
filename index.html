@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gym Admin — Sidebar Permissions</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,7 +14,6 @@
     --bg-card:       #ffffff;
     --bg-hover:      #e6e4df;
     --bg-active:     #dbeafe;
-    --bg-locked:     #f5f4f0;
     --border:        #d8d6d0;
     --text-primary:  #1a1a18;
     --text-secondary:#6b6a65;
@@ -22,183 +22,143 @@
     --accent-blue:   #2563eb;
     --accent-green:  #16a34a;
     --accent-purple: #7c3aed;
-    --accent-amber:  #d97706;
-    --accent-red:    #dc2626;
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
-body {
-  font-family: var(--font);
-  background: var(--bg-page);
-  color: var(--text-primary);
-  margin: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
+  html, body { height: 100%; width: 100%; overflow: hidden; }
+  body { font-family: var(--font); background: var(--bg-page); color: var(--text-primary); }
 
- .wrap {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  background: var(--bg-card);
-  overflow: hidden;
-}
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); opacity: 0; visibility: hidden; transition: .3s; z-index: 999; }
+  .overlay.show { opacity: 1; visibility: visible; }
 
-  /* SIDEBAR */
- .sidebar{
-    width:260px;
-    min-width:260px;
-    background:var(--bg-sidebar);
-    border-right:1px solid var(--border);
-    display:flex;
-    flex-direction:column;
-    transition:.3s;
-    z-index:1000;
-}
+  .wrap { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
 
-.menu-btn{
-    display:none;
-    background:none;
-    border:none;
-    font-size:24px;
-    cursor:pointer;
-    padding:4px;
-}
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 250px; min-width: 250px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    height: 100vh; overflow: hidden;
+    transition: left .3s; z-index: 1000;
+  }
 
-.overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.45);
-    opacity:0;
-    visibility:hidden;
-    transition:.3s;
-    z-index:999;
-}
+  .sidebar-top { padding: 18px 14px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .gym-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 
-.overlay.show{
-    opacity:1;
-    visibility:visible;
-}
-
-  .sidebar-top { padding: 16px 14px 12px; border-bottom: 1px solid var(--border); }
-  .gym-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
   .plan-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-top: 6px; }
   .badge-starter    { background: #dcfce7; color: #15803d; }
   .badge-growth     { background: #dbeafe; color: #1d4ed8; }
   .badge-pro        { background: #ede9fe; color: #6d28d9; }
   .badge-enterprise { background: #fef3c7; color: #b45309; }
+  .tier-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
   .nav { flex: 1; overflow-y: auto; padding: 6px 0 8px; }
   .nav::-webkit-scrollbar { width: 4px; }
   .nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-  .nav-section { padding: 10px 14px 3px; font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: .06em; text-transform: uppercase; }
+  .nav-section { padding: 11px 14px 3px; font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: .07em; text-transform: uppercase; }
 
-  .nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 14px; font-size: 13px; cursor: pointer; color: var(--text-primary); transition: background .12s; user-select: none; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--text-primary); transition: background .12s; user-select: none; border-right: 2.5px solid transparent; }
   .nav-item:hover:not(.locked) { background: var(--bg-hover); }
-  .nav-item.active { background: var(--bg-active); color: var(--text-active); border-right: 2px solid var(--accent-blue); }
-  .nav-item.locked { opacity: .45; cursor: not-allowed; color: var(--text-muted); }
-  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-item.active { background: var(--bg-active); color: var(--text-active); border-right-color: var(--accent-blue); font-weight: 600; }
+  .nav-item.locked { opacity: .38; cursor: not-allowed; color: var(--text-muted); }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
   .nav-item .label { flex: 1; }
-  .lock { font-size: 11px; color: var(--text-muted); }
+  .lock { font-size: 11px; }
 
-  .upgrade-hint { margin: 8px 10px 10px; padding: 9px 11px; background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background .12s; }
+  .upgrade-hint { margin: 8px 10px 12px; padding: 9px 11px; background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background .12s; flex-shrink: 0; }
   .upgrade-hint:hover { background: #ddd6fe; }
-  .upgrade-hint span { font-size: 12px; color: #6d28d9; font-weight: 500; flex: 1; }
-  .upgrade-hint .uh-icon { font-size: 16px; }
+  .upgrade-hint .uh-text { font-size: 12px; color: #6d28d9; font-weight: 500; flex: 1; line-height: 1.4; }
   .upgrade-hint.hidden { display: none; }
 
-  /* MAIN */
-  .main { flex: 1; background: var(--bg-page); display: flex; flex-direction: column; min-width: 0; }
+  /* ── MAIN ── */
+  .main { flex: 1; background: var(--bg-page); display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0; }
 
-  .topbar { padding: 13px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .topbar-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .topbar { padding: 13px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
 
-  .plan-switcher { display: flex; gap: 5px; flex-shrink: 0; }
-  .plan-btn { padding: 5px 13px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; background: var(--bg-card); color: var(--text-secondary); transition: all .15s; font-family: var(--font); }
+  .menu-btn { display: none; background: none; border: none; font-size: 22px; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+  .menu-btn:hover { background: var(--bg-hover); }
+
+  .plan-switcher { display: flex; gap: 5px; flex-shrink: 0; overflow-x: auto; }
+  .plan-switcher::-webkit-scrollbar { display: none; }
+  .plan-btn { padding: 5px 13px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; background: var(--bg-card); color: var(--text-secondary); transition: all .15s; font-family: var(--font); flex-shrink: 0; }
   .plan-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
   .plan-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
 
-  .content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .content { flex: 1; padding: 22px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
 
-.stat-row{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:12px;
-}
-  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-  .stat-val { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+  /* ── STAT CARDS ── */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; font-weight: 500; }
+  .stat-val { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+  .stat-trend { font-size: 11px; color: #16a34a; margin-top: 4px; }
 
-  .module-preview { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; display: flex; align-items: center; gap: 12px; }
-  .module-preview .mp-icon { font-size: 28px; }
-  .module-preview .mp-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .module-preview .mp-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  /* ── INFO CARDS ── */
+  .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .info-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; }
+  .info-card .ic-icon { font-size: 24px; flex-shrink: 0; margin-top: 1px; }
+  .info-card .ic-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .info-card .ic-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.45; }
 
-  .locked-module { background: var(--bg-card); border: 1.5px dashed var(--border); border-radius: 10px; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-  .locked-module .lm-icon { font-size: 32px; margin-bottom: 2px; }
-  .locked-module .lm-title { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-  .locked-module .lm-sub { font-size: 12px; color: var(--text-muted); max-width: 260px; }
-  .upgrade-cta { margin-top: 6px; padding: 7px 16px; background: var(--accent-purple); color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: background .12s; }
+  /* ── FEATURE GRID ── */
+  .plan-features { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; }
+  .pf-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; }
+  .pf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 5px 10px; }
+  .pf-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-primary); padding: 5px 0; }
+  .pf-item.locked-feat { color: var(--text-muted); }
+  .pf-check { color: #16a34a; font-size: 13px; font-weight: 700; }
+  .pf-x { color: var(--text-muted); font-size: 13px; }
+
+  /* ── LOCKED MODULE ── */
+  .locked-module { background: var(--bg-card); border: 1.5px dashed var(--border); border-radius: 12px; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+  .locked-module .lm-icon { font-size: 42px; margin-bottom: 4px; }
+  .locked-module .lm-title { font-size: 16px; font-weight: 700; color: var(--text-secondary); }
+  .locked-module .lm-sub { font-size: 13px; color: var(--text-muted); max-width: 340px; line-height: 1.55; }
+  .upgrade-cta { margin-top: 10px; padding: 9px 22px; background: var(--accent-purple); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: background .12s; }
   .upgrade-cta:hover { background: #6d28d9; }
 
-  /* Plan tier colors for badge */
-  .tier-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  /* ── BIOMETRIC CARD ── */
+  .bio-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .bio-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+  .bio-methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .bio-method { background: var(--bg-page); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color .15s; }
+  .bio-method:hover { border-color: var(--accent-blue); }
+  .bio-method.active-method { border-color: var(--accent-blue); background: var(--bg-active); }
+  .bio-method .bm-icon { font-size: 28px; flex-shrink: 0; }
+  .bio-method .bm-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .bio-method .bm-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+  .dot-on { background: #16a34a; }
+  .dot-off { background: var(--text-muted); }
 
-  @media (max-width:768px){
-    .sidebar{
-        position:fixed;
-        left:-260px;
-        top:0;
-        bottom:0;
-    }
+  /* ── ACHIEVEMENTS CARD ── */
+  .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .achievement-badge { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+  .achievement-badge.locked-badge { opacity: .4; filter: grayscale(1); }
+  .ab-icon { font-size: 32px; }
+  .ab-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .ab-desc { font-size: 11px; color: var(--text-secondary); }
+  .ab-earned { font-size: 10px; color: #16a34a; font-weight: 600; margin-top: 2px; }
 
-    .sidebar.open{
-        left:0;
-    }
-
-    .menu-btn{
-        display:block;
-    }
-
-  .topbar{
-    flex-wrap:wrap;
-    align-items:center;
+  @media (max-width: 768px) {
+    .sidebar { position: fixed; left: -250px; top: 0; bottom: 0; }
+    .sidebar.open { left: 0; }
+    .menu-btn { display: block; }
+    .topbar { flex-wrap: wrap; }
+    .plan-switcher { width: 100%; padding-top: 6px; }
   }
-
-  .plan-switcher{
-      display:flex;
-      width:100%;
-      overflow-x:auto;
-      gap:8px;
-      padding-top:8px;
-  }
-  
-  .plan-switcher::-webkit-scrollbar{
-      display:none;
-  }
-  
-  .plan-btn{
-      flex-shrink:0;
-  }
-
-    .stat-row{
-        grid-template-columns:1fr;
-    }
-
-    .module-preview{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-}
 </style>
 </head>
 <body>
-  <div class="overlay" id="overlay"></div>
+<div class="overlay" id="overlay"></div>
 <div class="wrap">
+
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="gym-name">FitZone Gyms</div>
       <div class="plan-badge badge-starter" id="plan-badge">
@@ -208,107 +168,147 @@ body {
     </div>
     <div class="nav" id="nav-list"></div>
     <div class="upgrade-hint" id="upgrade-hint" onclick="showUpgrade()">
-      <span class="uh-icon">⬆</span>
-      <span id="upgrade-text">Upgrade to Growth — ₹2,499/mo</span>
+      <span>⬆️</span>
+      <span class="uh-text" id="upgrade-text">Upgrade to Growth — ₹2,499/mo</span>
     </div>
   </div>
 
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <button class="menu-btn" id="menuBtn">
-    ☰
-</button>
-      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-left">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+      </div>
       <div class="plan-switcher">
         <button class="plan-btn active" onclick="setPlan('starter',this)">Starter</button>
-        <button class="plan-btn" onclick="setPlan('growth',this)">Growth</button>
-        <button class="plan-btn" onclick="setPlan('pro',this)">Pro</button>
-        <button class="plan-btn" onclick="setPlan('enterprise',this)">Enterprise</button>
+        <button class="plan-btn"        onclick="setPlan('growth',this)">Growth</button>
+        <button class="plan-btn"        onclick="setPlan('pro',this)">Pro</button>
+        <button class="plan-btn"        onclick="setPlan('enterprise',this)">Enterprise</button>
       </div>
     </div>
     <div class="content" id="main-content"></div>
   </div>
-</div>
 
+</div>
 <script>
+/* ── PLAN DEFINITIONS ── */
 const PLANS = {
   starter: {
     label:'Starter', badgeClass:'badge-starter', dot:'#16a34a', price:'₹999/mo',
-    modules:['dashboard','members','membership_plans','attendance','payments','settings']
+    modules:['dashboard','members','membership_plans','attendance','payments','achievements','settings']
   },
   growth: {
     label:'Growth', badgeClass:'badge-growth', dot:'#1d4ed8', price:'₹2,499/mo',
-    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance','payments','expenses','reports','notifications','leads','settings']
+    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance',
+             'payments','expenses','reports','notifications','leads','achievements','settings']
   },
   pro: {
     label:'Pro', badgeClass:'badge-pro', dot:'#6d28d9', price:'₹4,999/mo',
-    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance','payments','expenses','reports','notifications','leads','billing','rbac','equipment','reviews','coupons','settings']
+    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance',
+             'payments','expenses','reports','notifications','leads',
+             'billing','rbac','equipment','reviews','coupons','achievements','biometric','settings']
   },
   enterprise: {
     label:'Enterprise', badgeClass:'badge-enterprise', dot:'#b45309', price:'₹9,999/mo',
-    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance','payments','expenses','reports','notifications','leads','billing','rbac','equipment','reviews','coupons','ai_chatbot','ai_insights','ai_churn','ai_forecasting','ai_workout','trainer_portal','member_portal','settings']
+    modules:['dashboard','gym','branches','members','membership_plans','staff','attendance',
+             'payments','expenses','reports','notifications','leads',
+             'billing','rbac','equipment','reviews','coupons',
+             'achievements','biometric',
+             'ai_chatbot','ai_insights','ai_churn','ai_forecasting','ai_workout',
+             'trainer_portal','member_portal','settings']
   }
 };
 
+/* ── NAV STRUCTURE ── */
 const NAV = [
   {section:'Core'},
-  {id:'dashboard',       label:'Dashboard',          icon:'🏠'},
-  {id:'gym',             label:'Gym',                icon:'🏢'},
-  {id:'branches',        label:'Branches',           icon:'🔀'},
+  {id:'dashboard',        label:'Dashboard',            icon:'🏠'},
+  {id:'gym',              label:'Gym',                  icon:'🏢'},
+  {id:'branches',         label:'Branches',             icon:'🔀'},
   {section:'People'},
-  {id:'members',         label:'Members',            icon:'👥'},
-  {id:'staff',           label:'Staff',              icon:'🪪'},
-  {id:'leads',           label:'Leads / CRM',        icon:'🎯'},
+  {id:'members',          label:'Members',              icon:'👥'},
+  {id:'staff',            label:'Staff',                icon:'🪪'},
+  {id:'leads',            label:'Leads / CRM',          icon:'🎯'},
   {section:'Operations'},
-  {id:'attendance',      label:'Attendance',         icon:'✅'},
-  {id:'membership_plans',label:'Membership plans',   icon:'📋'},
-  {id:'payments',        label:'Payments',           icon:'💳'},
-  {id:'expenses',        label:'Expenses',           icon:'🧾'},
-  {id:'equipment',       label:'Equipment',          icon:'🏋️'},
+  {id:'attendance',       label:'Attendance',           icon:'✅'},
+  {id:'biometric',        label:'Face & Fingerprint',   icon:'🔐'},
+  {id:'membership_plans', label:'Membership plans',     icon:'📋'},
+  {id:'payments',         label:'Payments',             icon:'💳'},
+  {id:'expenses',         label:'Expenses',             icon:'🧾'},
+  {id:'equipment',        label:'Equipment',            icon:'🏋️'},
+  {section:'Engagement'},
+  {id:'achievements',     label:'Achievements',         icon:'🏆'},
+  {id:'reviews',          label:'Reviews',              icon:'⭐'},
   {section:'Finance & Admin'},
-  {id:'billing',         label:'Billing & invoices', icon:'🧮'},
-  {id:'coupons',         label:'Coupons & referrals',icon:'🎟️'},
-  {id:'rbac',            label:'Roles & permissions',icon:'🔐'},
+  {id:'billing',          label:'Billing & invoices',   icon:'🧮'},
+  {id:'coupons',          label:'Coupons & referrals',  icon:'🎟️'},
+  {id:'rbac',             label:'Roles & permissions',  icon:'🛡️'},
   {section:'Analytics'},
-  {id:'reports',         label:'Reports',            icon:'📊'},
-  {id:'reviews',         label:'Reviews',            icon:'⭐'},
+  {id:'reports',          label:'Reports',              icon:'📊'},
   {section:'AI Features'},
-  {id:'ai_chatbot',      label:'AI support chatbot', icon:'🤖'},
-  {id:'ai_insights',     label:'Attendance insights',icon:'🧠'},
-  {id:'ai_churn',        label:'Churn prediction',   icon:'📉'},
-  {id:'ai_forecasting',  label:'Revenue forecast',   icon:'📈'},
-  {id:'ai_workout',      label:'Workout / diet AI',  icon:'💪'},
+  {id:'ai_chatbot',       label:'AI support chatbot',   icon:'🤖'},
+  {id:'ai_insights',      label:'Attendance insights',  icon:'🧠'},
+  {id:'ai_churn',         label:'Churn prediction',     icon:'📉'},
+  {id:'ai_forecasting',   label:'Revenue forecast',     icon:'📈'},
+  {id:'ai_workout',       label:'Workout / diet AI',    icon:'💪'},
   {section:'Portals'},
-  {id:'trainer_portal',  label:'Trainer portal',     icon:'🏅'},
-  {id:'member_portal',   label:'Member portal',      icon:'📱'},
+  {id:'trainer_portal',   label:'Trainer portal',       icon:'🏅'},
+  {id:'member_portal',    label:'Member portal',        icon:'📱'},
   {section:'System'},
-  {id:'notifications',   label:'Notifications',      icon:'🔔'},
-  {id:'settings',        label:'Settings',           icon:'⚙️'},
+  {id:'notifications',    label:'Notifications',        icon:'🔔'},
+  {id:'settings',         label:'Settings',             icon:'⚙️'},
 ];
 
-const MODULE_LABELS = {
-  dashboard:'Dashboard overview',members:'Members list & profiles',staff:'Staff management',
-  attendance:'Attendance tracker',payments:'Payment history',reports:'Revenue & attendance reports',
-  leads:'Lead pipeline & CRM',ai_chatbot:'AI support chatbot (RAG)',ai_insights:'Smart attendance insights',
-  ai_churn:'Churn prediction model',ai_forecasting:'Revenue forecasting',
-  ai_workout:'AI workout & diet planner',trainer_portal:'Trainer session & plan portal',
-  member_portal:'Member self-service app',billing:'Invoice & GST management',
-  rbac:'Role & permission editor',equipment:'Equipment & maintenance',reviews:'Member feedback & ratings',
-  coupons:'Coupon & referral campaigns',notifications:'Notification centre',
-  gym:'Gym profile',branches:'Branch management',membership_plans:'Plan catalog',
-  expenses:'Expense tracker',settings:'System settings'
+const MODULE_INFO = {
+  dashboard:       {sub:'Active members, revenue & attendance at a glance',                    icon:'🏠'},
+  gym:             {sub:'Gym profile, logo, GST details and contact info',                     icon:'🏢'},
+  branches:        {sub:'Manage multiple branch locations and their managers',                  icon:'🔀'},
+  members:         {sub:'Full member directory, profiles and documents',                        icon:'👥'},
+  staff:           {sub:'Staff records, designations, salaries and access',                     icon:'🪪'},
+  leads:           {sub:'Walk-in enquiries, follow-ups and conversion tracking',                icon:'🎯'},
+  attendance:      {sub:'Daily check-in/out logs per member and branch',                        icon:'✅'},
+  biometric:       {sub:'Face recognition and fingerprint-based entry — no cards, no queues',  icon:'🔐'},
+  membership_plans:{sub:'Create and manage monthly, quarterly and annual plans',                icon:'📋'},
+  payments:        {sub:'Record and track all member payments and modes',                       icon:'💳'},
+  expenses:        {sub:'Branch-level expense tracking by category',                           icon:'🧾'},
+  equipment:       {sub:'Equipment catalog, warranty tracking and service logs',                icon:'🏋️'},
+  achievements:    {sub:'Milestone badges, streaks and leaderboards to keep members motivated', icon:'🏆'},
+  reviews:         {sub:'Member satisfaction ratings per branch and trainer',                   icon:'⭐'},
+  billing:         {sub:'Auto-generate GST invoices and track unpaid dues',                     icon:'🧮'},
+  coupons:         {sub:'Discount codes, referral programs and reward tracking',                icon:'🎟️'},
+  rbac:            {sub:'Fine-grained role and permission management per module',               icon:'🛡️'},
+  reports:         {sub:'Revenue, churn, attendance and expense reports',                       icon:'📊'},
+  ai_chatbot:      {sub:'RAG-based chatbot answering member queries automatically',             icon:'🤖'},
+  ai_insights:     {sub:'Flags dropping attendance and triggers retention alerts',              icon:'🧠'},
+  ai_churn:        {sub:'Predicts members likely to cancel before they do',                     icon:'📉'},
+  ai_forecasting:  {sub:'Time-series revenue forecast per branch for next month',               icon:'📈'},
+  ai_workout:      {sub:'LLM-generated starter workout and diet plans per member',              icon:'💪'},
+  trainer_portal:  {sub:'Assign plans, log sessions and track member progress',                 icon:'🏅'},
+  member_portal:   {sub:'Self-service app for invoices, attendance and bookings',               icon:'📱'},
+  notifications:   {sub:'Email, SMS and push notification centre',                              icon:'🔔'},
+  settings:        {sub:'System configuration, branding and integrations',                      icon:'⚙️'},
 };
 
-const NEXT = {starter:'growth',growth:'pro',pro:'enterprise'};
+const ACHIEVEMENTS_DATA = [
+  {icon:'🔥', name:'7-Day Streak',    desc:'Attended 7 days in a row',   earned:true,  date:'3 days ago'},
+  {icon:'💯', name:'100 Sessions',    desc:'Completed 100 gym sessions',  earned:true,  date:'2 weeks ago'},
+  {icon:'🌅', name:'Early Bird',      desc:'Check-in before 7 AM × 10',   earned:true,  date:'1 month ago'},
+  {icon:'🏃', name:'30-Day Warrior',  desc:'Attended 30 days in a month', earned:false, date:''},
+  {icon:'💪', name:'Strength Beast',  desc:'Logged 50 PT sessions',       earned:false, date:''},
+  {icon:'👑', name:'Top Member',      desc:'#1 attendance this month',    earned:false, date:''},
+  {icon:'🥇', name:'First Check-in',  desc:'First ever gym entry',        earned:true,  date:'6 months ago'},
+  {icon:'🎯', name:'Goal Crusher',    desc:'Hit all monthly targets',     earned:false, date:''},
+];
+
 const PLAN_ORDER = ['starter','growth','pro','enterprise'];
+const NEXT = {starter:'growth',growth:'pro',pro:'enterprise'};
 
-function planNeeded(moduleId){
-  return PLAN_ORDER.find(p => PLANS[p].modules.includes(moduleId)) || 'enterprise';
-}
+function planNeeded(id){ return PLAN_ORDER.find(p=>PLANS[p].modules.includes(id))||'enterprise'; }
 
-let currentPlan = 'starter', activeItem = 'dashboard';
+let currentPlan='starter', activeItem='dashboard';
 
+/* ── RENDER NAV ── */
 function renderNav(planKey){
   const enabled = new Set(PLANS[planKey].modules);
   const list = document.getElementById('nav-list');
@@ -322,112 +322,199 @@ function renderNav(planKey){
       return;
     }
     const ok = enabled.has(item.id);
-    const div = document.createElement('div');
     const isActive = item.id === activeItem && ok;
-    div.className = 'nav-item' + (!ok ? ' locked' : '') + (isActive ? ' active' : '');
-    div.title = !ok ? `Available on ${planNeeded(item.id)} plan` : item.label;
-    div.innerHTML = `<span class="icon">${item.icon}</span><span class="label">${item.label}</span>${!ok ? '<span class="lock">🔒</span>' : ''}`;
-    if(ok){
-    div.onclick = () => {
-        selectItem(item.id, item.label);
-
-        if(window.innerWidth <= 768){
-            sidebar.classList.remove("open");
-            overlay.classList.remove("show");
-        }
+    const div = document.createElement('div');
+    div.className = 'nav-item'+(ok?'':' locked')+(isActive?' active':'');
+    div.title = ok ? item.label : `Unlocks on ${planNeeded(item.id)} plan`;
+    div.innerHTML = `<span class="icon">${item.icon}</span><span class="label">${item.label}</span>${ok?'':'<span class="lock">🔒</span>'}`;
+    if(ok) div.onclick = () => {
+      selectItem(item.id);
+      if(window.innerWidth <= 768){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
     };
-}
     list.appendChild(div);
   });
 }
 
+/* ── BADGE ── */
 function renderBadge(planKey){
   const p = PLANS[planKey];
   const badge = document.getElementById('plan-badge');
-  badge.className = 'plan-badge ' + p.badgeClass;
+  badge.className = 'plan-badge '+p.badgeClass;
   badge.innerHTML = `<span class="tier-dot" style="background:${p.dot}"></span><span>${p.label}</span>`;
   const next = NEXT[planKey];
   const hint = document.getElementById('upgrade-hint');
-  if(next){
-    hint.classList.remove('hidden');
-    document.getElementById('upgrade-text').textContent = `Upgrade to ${PLANS[next].label} — ${PLANS[next].price}`;
-  } else {
-    hint.classList.add('hidden');
-  }
+  if(next){ hint.classList.remove('hidden'); document.getElementById('upgrade-text').textContent = `Upgrade to ${PLANS[next].label} — ${PLANS[next].price}`; }
+  else { hint.classList.add('hidden'); }
 }
 
-function selectItem(id, label){
+/* ── SELECT ── */
+function selectItem(id){
   activeItem = id;
-  document.getElementById('topbar-title').textContent = label;
+  document.getElementById('topbar-title').textContent = NAV.find(n=>n.id===id)?.label||id;
   renderNav(currentPlan);
   renderContent(id);
 }
 
+/* ── CONTENT ── */
 function renderContent(id){
   const mc = document.getElementById('main-content');
-  if(id === 'dashboard'){
+  const enabled = new Set(PLANS[currentPlan].modules);
+
+  /* DASHBOARD */
+  if(id==='dashboard'){
+    const allMods = NAV.filter(n=>n.id);
+    const unlockedCount = allMods.filter(n=>enabled.has(n.id)).length;
+    const featureItems = allMods.map(n=>{
+      const ok = enabled.has(n.id);
+      return `<div class="pf-item ${ok?'':'locked-feat'}"><span class="${ok?'pf-check':'pf-x'}">${ok?'✓':'○'}</span><span>${n.label}</span></div>`;
+    }).join('');
     mc.innerHTML = `
       <div class="stat-row">
-        <div class="stat-card"><div class="stat-label">Active members</div><div class="stat-val">142</div></div>
-        <div class="stat-card"><div class="stat-label">Revenue this month</div><div class="stat-val">₹1.2L</div></div>
-        <div class="stat-card"><div class="stat-label">Attendance today</div><div class="stat-val">38</div></div>
+        <div class="stat-card"><div class="stat-label">Active members</div><div class="stat-val">142</div><div class="stat-trend">↑ 12 this month</div></div>
+        <div class="stat-card"><div class="stat-label">Revenue this month</div><div class="stat-val">₹1.2L</div><div class="stat-trend">↑ 8% vs last month</div></div>
+        <div class="stat-card"><div class="stat-label">Attendance today</div><div class="stat-val">38</div><div class="stat-trend">Peak: 9–11 AM</div></div>
+        <div class="stat-card"><div class="stat-label">Modules active</div><div class="stat-val">${unlockedCount}/${allMods.length}</div><div class="stat-trend">${PLANS[currentPlan].label} plan</div></div>
       </div>
-      <div class="module-preview">
-        <span class="mp-icon">📊</span>
-        <div><div class="mp-title">Welcome back!</div><div class="mp-sub">Here's your gym at a glance for today.</div></div>
+      <div class="plan-features">
+        <div class="pf-title">Module access — ${PLANS[currentPlan].label} plan</div>
+        <div class="pf-grid">${featureItems}</div>
       </div>`;
-  } else {
-    mc.innerHTML = `
-      <div class="module-preview">
-        <span class="mp-icon">${NAV.find(n=>n.id===id)?.icon||'📄'}</span>
-        <div>
-          <div class="mp-title">${MODULE_LABELS[id]||id}</div>
-          <div class="mp-sub">This module is active on your current plan.</div>
-        </div>
-      </div>`;
+    return;
   }
+
+  /* ACHIEVEMENTS */
+  if(id==='achievements'){
+    const badges = ACHIEVEMENTS_DATA.map(a=>`
+      <div class="achievement-badge ${a.earned?'':'locked-badge'}">
+        <div class="ab-icon">${a.icon}</div>
+        <div class="ab-name">${a.name}</div>
+        <div class="ab-desc">${a.desc}</div>
+        ${a.earned ? `<div class="ab-earned">✓ Earned ${a.date}</div>` : '<div class="ab-desc">Not yet earned</div>'}
+      </div>`).join('');
+    mc.innerHTML = `
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-label">Badges earned</div><div class="stat-val">4</div><div class="stat-trend">of 8 total</div></div>
+        <div class="stat-card"><div class="stat-label">Active streaks</div><div class="stat-val">3</div><div class="stat-trend">Across all members</div></div>
+        <div class="stat-card"><div class="stat-label">Top achiever</div><div class="stat-val" style="font-size:16px">Rahul K.</div><div class="stat-trend">7 badges this month</div></div>
+        <div class="stat-card"><div class="stat-label">Engagement boost</div><div class="stat-val">+28%</div><div class="stat-trend">Since badges launched</div></div>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-title">🏆 Achievement badges</div>
+        <div class="achievements-grid">${badges}</div>
+      </div>`;
+    return;
+  }
+
+  /* BIOMETRIC */
+  if(id==='biometric'){
+    mc.innerHTML = `
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-label">Check-ins today</div><div class="stat-val">38</div><div class="stat-trend">via biometric</div></div>
+        <div class="stat-card"><div class="stat-label">Face enrolled</div><div class="stat-val">126</div><div class="stat-trend">of 142 members</div></div>
+        <div class="stat-card"><div class="stat-label">Fingerprint enrolled</div><div class="stat-val">98</div><div class="stat-trend">of 142 members</div></div>
+        <div class="stat-card"><div class="stat-label">Avg entry time</div><div class="stat-val">1.2s</div><div class="stat-trend">↓ 4s vs manual</div></div>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-title">🔐 Entry methods</div>
+        <div class="bio-methods">
+          <div class="bio-method active-method">
+            <span class="bm-icon">👤</span>
+            <div>
+              <div class="bm-title">Face recognition</div>
+              <div class="bm-sub">Camera-based check-in — touchless & instant</div>
+            </div>
+            <span class="status-dot dot-on" title="Active"></span>
+          </div>
+          <div class="bio-method active-method">
+            <span class="bm-icon">☝️</span>
+            <div>
+              <div class="bm-title">Fingerprint scanner</div>
+              <div class="bm-sub">Hardware sensor at entrance — fast & reliable</div>
+            </div>
+            <span class="status-dot dot-on" title="Active"></span>
+          </div>
+          <div class="bio-method">
+            <span class="bm-icon">📱</span>
+            <div>
+              <div class="bm-title">QR / Member app</div>
+              <div class="bm-sub">Fallback scan from member portal app</div>
+            </div>
+            <span class="status-dot dot-on" title="Active"></span>
+          </div>
+          <div class="bio-method">
+            <span class="bm-icon">🪪</span>
+            <div>
+              <div class="bm-title">RFID / NFC card</div>
+              <div class="bm-sub">Traditional card tap — legacy support</div>
+            </div>
+            <span class="status-dot dot-off" title="Disabled"></span>
+          </div>
+        </div>
+      </div>
+      <div class="cards-row">
+        <div class="info-card"><span class="ic-icon">🛡️</span><div><div class="ic-title">Privacy & data</div><div class="ic-sub">Biometric data encrypted at rest (AES-256). Stored locally on device — never sent to cloud.</div></div></div>
+        <div class="info-card"><span class="ic-icon">⚡</span><div><div class="ic-title">Speed</div><div class="ic-sub">Face recognition in under 1s. Eliminates front-desk queues during peak hours (6–9 AM).</div></div></div>
+        <div class="info-card"><span class="ic-icon">📲</span><div><div class="ic-title">Enrollment</div><div class="ic-sub">Members enroll via the Member Portal app or at the front desk in under 30 seconds.</div></div></div>
+      </div>`;
+    return;
+  }
+
+  /* LOCKED */
+  if(!enabled.has(id)){
+    const needed = planNeeded(id);
+    const info = MODULE_INFO[id]||{sub:'',icon:'📄'};
+    mc.innerHTML = `
+      <div class="locked-module">
+        <div class="lm-icon">🔒</div>
+        <div class="lm-title">${NAV.find(n=>n.id===id)?.label} is locked</div>
+        <div class="lm-sub">${info.sub}. Available from the <strong>${needed.charAt(0).toUpperCase()+needed.slice(1)}</strong> plan onwards.</div>
+        <button class="upgrade-cta" onclick="upgradeToNeeded('${needed}')">Upgrade to ${needed.charAt(0).toUpperCase()+needed.slice(1)} — ${PLANS[needed].price}</button>
+      </div>`;
+    return;
+  }
+
+  /* GENERIC ACTIVE MODULE */
+  const info = MODULE_INFO[id]||{sub:'Module content',icon:'📄'};
+  mc.innerHTML = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Total records</div><div class="stat-val">—</div><div class="stat-trend">All time</div></div>
+      <div class="stat-card"><div class="stat-label">Added this month</div><div class="stat-val">—</div><div class="stat-trend">Current period</div></div>
+      <div class="stat-card"><div class="stat-label">Last updated</div><div class="stat-val" style="font-size:16px">Today</div><div class="stat-trend">Just now</div></div>
+      <div class="stat-card"><div class="stat-label">Status</div><div class="stat-val" style="font-size:16px;color:#16a34a">✓ Active</div><div class="stat-trend">${PLANS[currentPlan].label} plan</div></div>
+    </div>
+    <div class="cards-row">
+      <div class="info-card"><span class="ic-icon">${info.icon}</span><div><div class="ic-title">${NAV.find(n=>n.id===id)?.label||id}</div><div class="ic-sub">${info.sub}</div></div></div>
+      <div class="info-card"><span class="ic-icon">📁</span><div><div class="ic-title">Data management</div><div class="ic-sub">Create, edit, search and export records for this module.</div></div></div>
+      <div class="info-card"><span class="ic-icon">🔔</span><div><div class="ic-title">Notifications</div><div class="ic-sub">Automated alerts and reminders tied to this module's data.</div></div></div>
+    </div>`;
 }
 
+/* ── PLAN SWITCH ── */
 function setPlan(planKey, btn){
   currentPlan = planKey;
-  document.querySelectorAll('.plan-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.plan-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderNav(planKey);
-  renderBadge(planKey);
+  const enabled = new Set(PLANS[planKey].modules);
+  if(!enabled.has(activeItem)) activeItem='dashboard';
+  document.getElementById('topbar-title').textContent = NAV.find(n=>n.id===activeItem)?.label||'Dashboard';
+  renderNav(planKey); renderBadge(planKey); renderContent(activeItem);
 }
 
-function showUpgrade(){
-  const next = NEXT[currentPlan];
-  if(next) alert(`Upgrade to ${PLANS[next].label} (${PLANS[next].price}) to unlock more modules.`);
-}
+function showUpgrade(){ const next=NEXT[currentPlan]; if(next){ const btn=document.querySelectorAll('.plan-btn')[PLAN_ORDER.indexOf(next)]; setPlan(next,btn); } }
+function upgradeToNeeded(p){ const btn=document.querySelectorAll('.plan-btn')[PLAN_ORDER.indexOf(p)]; setPlan(p,btn); }
 
+/* ── MOBILE MENU ── */
+const sidebar  = document.getElementById('sidebar');
+const overlay  = document.getElementById('overlay');
+const menuBtn  = document.getElementById('menuBtn');
+menuBtn.onclick = () => { sidebar.classList.add('open'); overlay.classList.add('show'); };
+overlay.onclick = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+window.addEventListener('resize', () => { if(window.innerWidth>768){ sidebar.classList.remove('open'); overlay.classList.remove('show'); } });
+
+/* ── INIT ── */
 renderNav('starter');
 renderBadge('starter');
 renderContent('dashboard');
-
-const sidebar=document.querySelector(".sidebar");
-const menuBtn=document.getElementById("menuBtn");
-const overlay=document.getElementById("overlay");
-
-menuBtn.onclick=()=>{
-    sidebar.classList.add("open");
-    overlay.classList.add("show");
-}
-
-overlay.onclick=()=>{
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-}
-
-window.addEventListener("resize", () => {
-    if(window.innerWidth > 768){
-        sidebar.classList.remove("open");
-        overlay.classList.remove("show");
-    }
-});
-
 </script>
 </body>
 </html>
-
-
