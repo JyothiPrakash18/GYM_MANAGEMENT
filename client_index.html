@@ -1,1310 +1,1014 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Fitness</title>
+<title>EliteFitness — Train With Purpose</title>
 <style>
 
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+/* ── RESET ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ══════════════════════════════════════════
+   THEME TOKENS
+   All colours reference these vars only.
+   ══════════════════════════════════════════ */
+
+/* DARK (default) */
+:root, [data-theme="dark"] {
+  --bg-base:    #0a0a0a;
+  --bg-raised:  #111318;
+  --bg-surface: #1c1f27;
+  --bg-overlay: #23262f;
+
+  --text-primary:  #ffffff;
+  --text-secondary:#c4c8d4;
+  --text-muted:    #8b909e;
+
+  --border:     #23262f;
+  --border-soft:#1a1d25;
+
+  --lime:       #c8f23a;
+  --lime-dk:    #a8d420;
+  --lime-glow:  rgba(200,242,58,.18);
+  --lime-text:  #0a0a0a;   /* text ON lime background */
+
+  --header-bg:  rgba(10,10,10,0.88);
+  --mob-nav-bg: rgba(10,10,10,0.97);
+
+  --hero-split: #1c1f27;
+  --hero-split-op: 1;
+
+  --card-hover: #1c1f27;
+
+  --btn-outline-color: #ffffff;
+  --btn-outline-hover-color: var(--lime);
+
+  --cta-bg:     var(--lime);
+  --cta-text:   #0a0a0a;
+  --cta-sub:    rgba(0,0,0,.6);
+  --cta-btn-bg: #0a0a0a;
+  --cta-btn-color: var(--lime);
+
+  --footer-bg:  #0a0a0a;
+  --footer-border: #23262f;
+
+  --stats-band-bg: var(--lime);
+  --stats-band-text: #0a0a0a;
+  --stats-band-muted: rgba(0,0,0,.55);
+  --stats-band-div:   rgba(0,0,0,.15);
+
+  --toggle-bg:      #23262f;
+  --toggle-knob:    #ffffff;
+  --toggle-icon-l:  #8b909e;
+  --toggle-icon-d:  var(--lime);
+
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ff-display: 'Arial Black', 'Helvetica Neue', sans-serif;
+  --ff-body:    'Arial', 'Helvetica Neue', sans-serif;
 }
 
-:root {
-  --blue: #2563eb;
-  --blue-dark: #1d4ed8;
-  --blue-light: #eff6ff;
-  --bg: #f7f9fc;
-  --text: #222;
-  --muted: #666;
-  --card-shadow: 0 10px 30px rgba(0,0,0,.08);
+/* LIGHT */
+[data-theme="light"] {
+  --bg-base:    #f4f5f7;
+  --bg-raised:  #ffffff;
+  --bg-surface: #eef0f4;
+  --bg-overlay: #e4e7ed;
+
+  --text-primary:  #0d0f14;
+  --text-secondary:#2d3240;
+  --text-muted:    #6b7280;
+
+  --border:     #d8dce6;
+  --border-soft:#e8eaef;
+
+  --lime:       #7db800;
+  --lime-dk:    #6a9e00;
+  --lime-glow:  rgba(125,184,0,.14);
+  --lime-text:  #ffffff;
+
+  --header-bg:  rgba(244,245,247,0.9);
+  --mob-nav-bg: rgba(244,245,247,0.98);
+
+  --hero-split: #e4e7ed;
+  --hero-split-op: 1;
+
+  --card-hover: #eef0f4;
+
+  --btn-outline-color: #0d0f14;
+  --btn-outline-hover-color: var(--lime);
+
+  --cta-bg:     var(--lime);
+  --cta-text:   #ffffff;
+  --cta-sub:    rgba(255,255,255,.75);
+  --cta-btn-bg: #0d0f14;
+  --cta-btn-color: #ffffff;
+
+  --footer-bg:  #0d0f14;
+  --footer-border: #1a1d25;
+
+  --stats-band-bg: var(--lime);
+  --stats-band-text: #ffffff;
+  --stats-band-muted: rgba(255,255,255,.7);
+  --stats-band-div:   rgba(255,255,255,.25);
+
+  --toggle-bg:      #d8dce6;
+  --toggle-knob:    #0d0f14;
+  --toggle-icon-l:  var(--lime);
+  --toggle-icon-d:  #9ca3af;
+}
+
+/* ── THEME TRANSITION ── */
+body, header, .mobile-nav, .hero::before, .prog-card,
+.trainer-card, .plan, .tcard, footer, .stats-band,
+.section-dark, .section-mid, .theme-toggle {
+  transition: background .35s ease, border-color .35s ease, color .35s ease,
+              box-shadow .35s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-  .particle { display: none; }
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--ff-body);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── SCROLL PROGRESS BAR ── */
+/* ── SCROLL PROGRESS ── */
 .progress-bar {
-  position: fixed;
-  top: 0; left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #2563eb, #3b82f6, #06b6d4);
-  z-index: 200;
-  transition: width 0.1s linear;
-  border-radius: 0 2px 2px 0;
-  width: 0%;
-}
-
-/* ── CURSOR GLOW ── */
-.cursor-glow {
-  position: fixed;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-  transition: opacity 0.3s ease;
-  mix-blend-mode: multiply;
-}
-
-/* ── FLOATING PARTICLES ── */
-.particle {
-  position: fixed;
-  border-radius: 50%;
-  background: rgba(37,99,235,0.12);
-  animation: floatParticle linear infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes floatParticle {
-  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 0.4; }
-  100% { transform: translateY(-120px) scale(1); opacity: 0; }
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--lime); z-index: 9999;
+  width: 0%; transition: width 0.1s linear;
 }
 
 /* ── HEADER ── */
 header {
-  width: 100%;
-  padding: 18px 8%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  transition: box-shadow 0.3s ease, background 0.3s ease;
-  animation: headerSlide 0.6s ease both;
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 68px;
+  background: var(--header-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  animation: slideDown .5s var(--ease-spring) both;
 }
 
-@keyframes headerSlide {
+@keyframes slideDown {
   from { transform: translateY(-100%); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
 }
 
+.header-right { display: flex; align-items: center; gap: 16px; }
+
 .logo {
-  font-size: 26px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  font-family: var(--ff-display);
+  font-size: 18px; font-weight: 900;
+  letter-spacing: -0.5px; text-transform: uppercase;
+  color: var(--text-primary);
 }
+.logo span { color: var(--lime); }
 
-nav {
-  display: flex;
-  gap: 28px;
-}
-
+nav { display: flex; align-items: center; gap: 32px; }
 nav a {
-  text-decoration: none;
-  color: #444;
-  font-weight: 600;
-  position: relative;
-  padding-bottom: 3px;
-  transition: color 0.2s;
+  text-decoration: none; color: var(--text-muted);
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.4px; text-transform: uppercase;
+  transition: color .2s;
+}
+nav a:hover { color: var(--text-primary); }
+
+.nav-cta {
+  padding: 9px 22px; background: var(--lime);
+  color: var(--lime-text) !important;
+  border-radius: 6px; font-weight: 800 !important;
+  font-size: 12px !important; letter-spacing: 0.5px;
+}
+.nav-cta:hover {
+  background: var(--lime-dk) !important;
+  color: var(--lime-text) !important;
+  transform: translateY(-1px);
 }
 
-nav a::after {
-  content: '';
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 0; height: 2px;
-  background: linear-gradient(90deg, var(--blue), #3b82f6);
-  transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
-  border-radius: 2px;
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  width: 52px; height: 28px; border-radius: 14px;
+  background: var(--toggle-bg);
+  border: 1.5px solid var(--border);
+  cursor: pointer; position: relative;
+  flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 3px;
+  transition: background .3s, border-color .3s;
 }
 
-nav a:hover { color: var(--blue); }
-nav a:hover::after { width: 100%; }
+.toggle-icons {
+  position: absolute; inset: 0;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 6px; pointer-events: none;
+  font-size: 11px;
+}
 
-/* Hamburger */
+.toggle-sun  { color: var(--toggle-icon-l); transition: color .3s; }
+.toggle-moon { color: var(--toggle-icon-d); transition: color .3s; }
+
+.toggle-knob {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--toggle-knob);
+  position: absolute; left: 4px;
+  transition: transform .3s var(--ease-spring), background .3s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+
+[data-theme="light"] .toggle-knob { transform: translateX(24px); }
+
+/* ── HAMBURGER ── */
 .hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  padding: 4px;
-  background: none;
-  border: none;
+  display: none; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 4px;
 }
 .hamburger span {
-  display: block;
-  width: 24px; height: 2px;
-  background: #333;
-  border-radius: 2px;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: block; width: 22px; height: 2px;
+  background: var(--text-primary); border-radius: 2px;
+  transition: transform .3s, opacity .3s, background .3s;
 }
 .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity: 0; }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 .mobile-nav {
-  display: none;
-  flex-direction: column;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(12px);
-  position: fixed;
-  top: 64px; left: 0; right: 0;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  z-index: 99;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.35s ease;
+  display: none; flex-direction: column;
+  position: fixed; top: 68px; left: 0; right: 0;
+  background: var(--mob-nav-bg);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  z-index: 99; max-height: 0; overflow: hidden;
+  transition: max-height .35s var(--ease-spring);
 }
-.mobile-nav.open { max-height: 400px; }
+.mobile-nav.open { max-height: 420px; }
 .mobile-nav a {
-  text-decoration: none;
-  color: #333;
-  padding: 16px 8%;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background 0.2s, padding-left 0.2s;
+  display: block; text-decoration: none;
+  color: var(--text-muted); padding: 15px 6%;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  transition: color .2s, padding-left .2s;
 }
-.mobile-nav a:hover { background: #f8fafc; padding-left: 10%; }
-
-/* ── BUTTON ── */
-.btn {
-  display: inline-block;
-  padding: 12px 28px;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
-  transition: left 0.4s ease;
-}
-.btn:hover::before { left: 100%; }
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(37,99,235,.4);
-}
-.btn:active { transform: translateY(0); }
-
-.btn .ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transform: scale(0);
-  animation: rippleAnim 0.6s linear;
-  pointer-events: none;
-}
-@keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+.mobile-nav a:hover { color: var(--text-primary); padding-left: 8%; }
+.mobile-nav .m-cta { color: var(--lime) !important; border-bottom: none; padding: 18px 6%; }
 
 /* ── HERO ── */
 .hero {
-  width: 90%;
-  margin: auto;
-  min-height: 90vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 60px;
-  position: relative;
+  min-height: calc(100vh - 68px);
+  display: grid; grid-template-columns: 1.05fr 0.95fr;
+  align-items: center; gap: 0; padding: 0 5%;
+  position: relative; overflow: hidden;
 }
 
-/* Ambient gradient blob */
 .hero::before {
-  content: '';
-  position: absolute;
-  top: -30%;
-  right: -15%;
-  width: 60%;
-  height: 160%;
-  background: radial-gradient(ellipse at center, rgba(37,99,235,0.05) 0%, transparent 65%);
-  animation: meshPulse 7s ease-in-out infinite;
-  pointer-events: none;
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 48%; height: 100%;
+  background: var(--hero-split);
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+  z-index: 0;
 }
 
-@keyframes meshPulse {
-  0%, 100% { transform: scale(1) translateY(0); opacity: 0.7; }
-  50% { transform: scale(1.1) translateY(-20px); opacity: 1; }
+.hero::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lime), transparent);
+  opacity: 0.4;
 }
 
-.hero-text { position: relative; z-index: 1; }
+.hero-text { position: relative; z-index: 1; padding: 80px 0; }
 
-.hero h5 {
-  display: inline-block;
-  color: var(--blue);
-  letter-spacing: 2px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: var(--blue-light);
-  padding: 5px 14px;
-  border-radius: 20px;
-  margin-bottom: 18px;
-  opacity: 0;
-  animation: fadeUp 0.6s 0.2s ease both;
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--lime); margin-bottom: 28px;
+  opacity: 0; animation: fadeUp .5s .15s var(--ease-spring) both;
+}
+.hero-eyebrow::before {
+  content: ''; display: inline-block; width: 28px; height: 2px;
+  background: var(--lime); border-radius: 2px;
 }
 
 .hero h1 {
-  font-size: 58px;
-  line-height: 1.15;
-  margin-bottom: 20px;
-  opacity: 0;
-  animation: fadeUp 0.7s 0.35s ease both;
+  font-family: var(--ff-display);
+  font-size: clamp(44px, 6vw, 80px);
+  font-weight: 900; line-height: 1.0;
+  letter-spacing: -2px; text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  opacity: 0; animation: fadeUp .6s .28s var(--ease-spring) both;
+}
+.hero h1 em { font-style: normal; color: var(--lime); display: block; }
+
+.hero-desc {
+  font-size: 16px; color: var(--text-muted); line-height: 1.75;
+  max-width: 440px; margin-bottom: 40px;
+  opacity: 0; animation: fadeUp .6s .42s var(--ease-spring) both;
 }
 
-.hero h1 span {
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  animation: gradientShift 4s ease infinite;
+.hero-actions {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp .6s .55s var(--ease-spring) both;
 }
 
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-block; padding: 14px 32px;
+  background: var(--lime); color: var(--lime-text);
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  text-decoration: none; border-radius: 6px; border: none; cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  position: relative; overflow: hidden;
+}
+.btn-primary:hover {
+  background: var(--lime-dk); transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--lime-glow);
 }
 
-.hero p {
-  font-size: 18px;
-  color: var(--muted);
-  line-height: 1.75;
-  margin-bottom: 35px;
-  opacity: 0;
-  animation: fadeUp 0.7s 0.5s ease both;
+.btn-outline {
+  display: inline-block; padding: 13px 28px;
+  border: 1.5px solid var(--border);
+  color: var(--btn-outline-color);
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  text-decoration: none; border-radius: 6px;
+  transition: border-color .2s, color .2s, background .2s;
+  background: transparent;
+}
+.btn-outline:hover { border-color: var(--lime); color: var(--btn-outline-hover-color); }
+
+/* ── HERO STATS ── */
+.hero-stats {
+  display: flex; gap: 0; margin-top: 56px;
+  border-top: 1px solid var(--border); padding-top: 36px;
+  opacity: 0; animation: fadeUp .6s .68s var(--ease-spring) both;
 }
 
-.buttons {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  flex-wrap: wrap;
-  opacity: 0;
-  animation: fadeUp 0.7s 0.65s ease both;
+.hstat { flex: 1; padding-right: 28px; border-right: 1px solid var(--border); margin-right: 28px; }
+.hstat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+.hstat-num {
+  display: block; font-family: var(--ff-display);
+  font-size: 30px; font-weight: 900;
+  color: var(--lime); line-height: 1; margin-bottom: 4px;
+}
+.hstat-label {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);
 }
 
-.secondary {
-  color: var(--blue);
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: gap 0.2s ease;
+/* ── HERO VISUAL ── */
+.hero-visual {
+  position: relative; z-index: 1; padding: 60px 0 60px 5%;
+  opacity: 0; animation: fadeLeft .8s .35s var(--ease-spring) both;
 }
-.secondary:hover { gap: 10px; }
-
-/* Stats */
-.stats {
-  display: flex;
-  gap: 40px;
-  margin-top: 44px;
-  opacity: 0;
-  animation: fadeUp 0.7s 0.8s ease both;
+.hero-img {
+  width: 100%; border-radius: 4px; display: block;
+  aspect-ratio: 4/5; object-fit: cover;
+  filter: grayscale(15%);
+  transition: transform .5s var(--ease-spring), filter .5s;
 }
+.hero-visual:hover .hero-img { transform: scale(1.02); filter: grayscale(0%); }
 
-.stats .stat-item { text-align: left; }
-
-.stats .stat-item + .stat-item {
-  padding-left: 40px;
-  border-left: 1px solid #e2e8f0;
+.hero-chip {
+  position: absolute; bottom: 80px; left: -20px;
+  background: var(--lime); color: var(--lime-text);
+  border-radius: 6px; padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 12px 40px var(--lime-glow);
+  animation: chipFloat 3s ease-in-out infinite; z-index: 2;
 }
+@keyframes chipFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.chip-num { font-family: var(--ff-display); font-size: 22px; font-weight: 900; }
+.chip-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
 
-.stats h2 {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--blue);
-  line-height: 1;
+.hero-rating {
+  position: absolute; top: 70px; right: -12px;
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: 6px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px; z-index: 2;
+  animation: chipFloat 3s 1.5s ease-in-out infinite;
 }
+.rating-val { font-weight: 800; font-size: 16px; color: var(--text-primary); }
+.rating-sub { font-size: 11px; color: var(--text-muted); }
 
-.stats p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
-  margin-bottom: 0;
-  opacity: 1;
-  animation: none;
-}
-
-/* ── HERO IMAGE ── */
-.hero-image-wrap {
-  position: relative;
-  z-index: 1;
-  opacity: 0;
-  animation: fadeLeft 0.9s 0.4s cubic-bezier(0.22,1,0.36,1) both;
-}
-
-@keyframes fadeLeft {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.hero-image-wrap img {
-  width: 100%;
-  border-radius: 20px;
-  display: block;
-  box-shadow: 0 30px 80px rgba(37,99,235,.18), 0 10px 30px rgba(0,0,0,.10);
-  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease;
-}
-
-.hero-image-wrap:hover img {
-  transform: scale(1.02) rotate(-0.5deg);
-  box-shadow: 0 40px 100px rgba(37,99,235,.22), 0 16px 40px rgba(0,0,0,.14);
-}
-
-/* Floating badges */
-.hero-badge {
-  position: absolute;
-  bottom: -18px;
-  left: -24px;
-  background: white;
-  border-radius: 14px;
-  padding: 14px 20px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.12);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: badgeBounce 3s ease-in-out infinite;
-  z-index: 2;
-}
-
-.hero-badge2 {
-  position: absolute;
-  top: -16px;
-  right: -16px;
-  background: white;
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.12);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: badgeBounce 3s 1.5s ease-in-out infinite;
-  z-index: 2;
-}
-
-@keyframes badgeBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.badge-icon {
-  width: 38px; height: 38px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-}
-
-.badge-icon2 {
-  width: 34px; height: 34px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-}
-
-.badge-num { font-weight: 800; font-size: 15px; color: var(--text); }
-.badge-label { font-size: 11px; color: var(--muted); }
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeLeft { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: translateX(0); } }
 
 /* ── SECTIONS ── */
-section {
-  padding: 80px 8%;
-  position: relative;
+.section { padding: 100px 5%; position: relative; }
+.section-dark  { background: var(--bg-raised); }
+.section-mid   { background: var(--bg-surface); }
+
+.section-header { margin-bottom: 56px; }
+.section-header.center { text-align: center; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 2.5px; text-transform: uppercase; color: var(--lime); margin-bottom: 14px;
+}
+.eyebrow::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--lime); border-radius: 2px; }
+.section-header.center .eyebrow::before { display: none; }
+.section-header.center .eyebrow::after  { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--lime); border-radius: 2px; }
+
+.section-title {
+  font-family: var(--ff-display);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 900; line-height: 1.05;
+  letter-spacing: -1.5px; text-transform: uppercase;
+  color: var(--text-primary); margin-bottom: 14px;
+}
+.section-sub { font-size: 15px; color: var(--text-muted); line-height: 1.7; max-width: 480px; }
+.section-header.center .section-sub { margin: 0 auto; }
+
+/* ── PROGRAMS ── */
+.programs-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.title .section-label {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--blue);
-  margin-bottom: 12px;
-}
-
-.title h2 { font-size: 32px; margin-bottom: 10px; }
-.title p { color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.6; }
-
-/* ── PROGRAMS CARDS ── */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 25px;
-}
-
-.card {
-  background: white;
-  padding: 32px;
-  border-radius: 18px;
-  box-shadow: var(--card-shadow);
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
-  opacity: 0;
-  transform: translateY(32px);
-  position: relative;
-  overflow: hidden;
+.prog-card {
+  background: var(--bg-raised); padding: 36px 30px;
+  position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(20px);
   cursor: default;
 }
-
-/* Shimmer */
-.card::after {
-  content: '';
-  position: absolute;
-  top: -50%; left: -60%;
-  width: 40%; height: 200%;
-  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.6), transparent);
-  transform: skewX(-15deg);
-  transition: left 0.5s ease;
-  pointer-events: none;
+.prog-card.visible { animation: cardIn .5s var(--ease-spring) both; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.prog-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--lime);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .35s var(--ease-spring);
 }
-.card:hover::after { left: 160%; }
+.prog-card:hover { background: var(--card-hover); }
+.prog-card:hover::before { transform: scaleX(1); }
 
-/* Accent top bar */
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--blue), #3b82f6, #06b6d4);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-  border-radius: 18px 18px 0 0;
+.prog-num {
+  font-family: var(--ff-display); font-size: 11px; font-weight: 900;
+  color: var(--lime); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 20px; display: block;
 }
-.card:hover::before { transform: scaleX(1); }
-
-.card.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1),
-              box-shadow 0.35s ease;
+.prog-icon { font-size: 32px; margin-bottom: 16px; display: block; transition: transform .3s var(--ease-spring); }
+.prog-card:hover .prog-icon { transform: scale(1.15) rotate(-5deg); }
+.prog-card h3 {
+  font-family: var(--ff-display); font-size: 17px; font-weight: 900;
+  letter-spacing: -0.3px; text-transform: uppercase;
+  color: var(--text-primary); margin-bottom: 10px;
 }
+.prog-card p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
 
-.card:hover {
-  transform: translateY(-8px) !important;
-  box-shadow: 0 24px 50px rgba(0,0,0,.13);
+/* ── STATS BAND ── */
+.stats-band { background: var(--stats-band-bg); padding: 60px 5%; }
+.stats-band-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+.sb-item {
+  text-align: center; padding: 0 20px;
+  border-right: 1px solid var(--stats-band-div);
+  opacity: 0; transform: translateY(16px);
 }
+.sb-item:last-child { border-right: none; }
+.sb-item.visible { animation: cardIn .5s var(--ease-spring) both; }
 
-.card-icon {
-  width: 52px; height: 52px;
-  border-radius: 14px;
-  background: var(--blue-light);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-  margin-bottom: 18px;
-  transition: transform 0.3s ease, background 0.3s ease;
+.sb-num {
+  display: block; font-family: var(--ff-display);
+  font-size: clamp(36px, 5vw, 56px); font-weight: 900;
+  color: var(--stats-band-text); line-height: 1; margin-bottom: 6px;
 }
-.card:hover .card-icon {
-  transform: rotate(-6deg) scale(1.1);
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-}
-
-.card h3 { font-size: 17px; margin-bottom: 10px; font-weight: 700; }
-.card p { color: var(--muted); line-height: 1.6; font-size: 14px; }
-
-/* ── STATS BANNER ── */
-.stats-section {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.stats-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23fff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  position: relative;
-  z-index: 1;
-}
-
-.stat-item-banner {
-  text-align: center;
-  color: white;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.stat-item-banner.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1);
-}
-
-.stat-num-banner {
-  font-size: 42px;
-  font-weight: 800;
-  display: block;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.stat-label-banner {
-  font-size: 14px;
-  opacity: 0.75;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 500;
+.sb-label {
+  font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 2px;
+  color: var(--stats-band-muted);
 }
 
 /* ── TRAINERS ── */
-.trainers {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 25px;
-}
+.trainers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
 .trainer-card {
-  background: white;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: var(--card-shadow);
-  opacity: 0;
-  transform: translateY(32px);
-  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
+  border-radius: 6px; overflow: hidden;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  opacity: 0; transform: translateY(24px);
+  transition: transform .35s var(--ease-spring), border-color .3s;
   cursor: default;
 }
+.trainer-card.visible { animation: cardIn .55s var(--ease-spring) both; }
+.trainer-card:hover { transform: translateY(-6px) !important; border-color: var(--lime); }
 
-.trainer-card.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
-}
-
-.trainer-card:hover {
-  transform: translateY(-8px) !important;
-  box-shadow: 0 24px 50px rgba(37,99,235,.15);
-}
-
+.trainer-img-wrap { position: relative; overflow: hidden; height: 200px; }
 .trainer-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s ease;
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  display: block; filter: grayscale(20%);
+  transition: transform .5s var(--ease-spring), filter .4s;
 }
-.trainer-card:hover .trainer-img { transform: scale(1.06); }
+.trainer-card:hover .trainer-img { transform: scale(1.07); filter: grayscale(0%); }
 
-.trainer-info {
-  padding: 20px 22px;
+.trainer-body { padding: 20px; }
+.trainer-body h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+.trainer-role {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--lime); margin-bottom: 8px; display: block;
 }
-
-.trainer-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.trainer-info .role {
-  font-size: 12px;
-  color: var(--blue);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-.trainer-info p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.trainer-body p { font-size: 12px; color: var(--text-muted); line-height: 1.65; }
 
 /* ── PRICING ── */
-.pricing {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+
+.plan {
+  border-radius: 8px; border: 1px solid var(--border);
+  padding: 40px 32px; background: var(--bg-raised);
+  position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(24px);
+  transition: border-color .3s, transform .35s var(--ease-spring);
+  cursor: default;
+}
+.plan.visible { animation: cardIn .55s var(--ease-spring) both; }
+.plan:hover { transform: translateY(-6px) !important; }
+.plan.featured { border-color: var(--lime); background: var(--bg-surface); }
+
+.plan-badge {
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: var(--lime); color: var(--lime-text);
+  font-size: 10px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 4px 16px; border-radius: 0 0 6px 6px;
 }
 
-.price {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: var(--card-shadow);
-  border: 2px solid transparent;
-  transition: border-color 0.3s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
-  opacity: 0;
-  transform: translateY(32px);
-  position: relative;
-  overflow: hidden;
-}
+.plan-name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px; display: block; }
+.plan-price { font-family: var(--ff-display); font-size: clamp(36px, 5vw, 52px); font-weight: 900; letter-spacing: -2px; line-height: 1; margin-bottom: 4px; color: var(--text-primary); }
+.plan-period { font-size: 14px; color: var(--text-muted); font-weight: 400; margin-bottom: 28px; display: block; }
+.plan-divider { height: 1px; background: var(--border); margin: 24px 0; }
 
-.price.visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1),
-              border-color 0.3s ease, box-shadow 0.35s ease;
+.plan-features { list-style: none; margin-bottom: 32px; }
+.plan-features li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--text-muted); line-height: 1.5;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
 }
-
-.price:hover {
-  border-color: var(--blue);
-  transform: translateY(-8px) !important;
-  box-shadow: 0 24px 60px rgba(37,99,235,.18);
+.plan-features li:last-child { border-bottom: none; }
+.plan-features li::before {
+  content: '✓'; width: 18px; height: 18px; flex-shrink: 0;
+  border-radius: 50%; background: var(--lime-glow);
+  color: var(--lime); font-size: 10px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px;
 }
-
-.price h3 { font-size: 16px; color: var(--muted); font-weight: 600; }
-.price h2 { margin: 16px 0 6px; color: var(--blue); font-size: 40px; font-weight: 800; }
-
-.price-features {
-  list-style: none;
-  margin: 20px 0;
-  text-align: left;
-}
-.price-features li {
-  padding: 7px 0;
-  color: var(--muted);
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.price-features li::before {
-  content: '✓';
-  width: 20px; height: 20px;
-  background: var(--blue-light);
-  color: var(--blue);
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.price.popular {
-  border-color: var(--blue);
-  background: linear-gradient(180deg, #eff6ff 0%, white 40%);
-}
-
-.price.popular::before {
-  content: 'Most Popular';
-  position: absolute;
-  top: -14px; left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 4px 16px;
-  border-radius: 20px;
-  text-transform: uppercase;
-}
-
-/* ── BILLING TOGGLE ── */
-.billing-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 44px;
-  background: white;
-  border-radius: 14px;
-  padding: 6px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.08);
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.billing-toggle button {
-  padding: 10px 22px;
-  border: none;
-  background: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
-  position: relative;
-  white-space: nowrap;
-}
-
-.billing-toggle button.active {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
-  box-shadow: 0 4px 14px rgba(37,99,235,.35);
-}
-
-.billing-toggle button:not(.active):hover {
-  background: var(--blue-light);
-  color: var(--blue);
-}
-
-/* Savings badge on buttons */
-.save-badge {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  background: #10b981;
-  color: white;
-  border-radius: 20px;
-  padding: 1px 7px;
-  margin-left: 6px;
-  vertical-align: middle;
-  line-height: 16px;
-}
-
-/* Price display animation */
-.price-amount {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.price-amount.switching {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-
-/* Total billing note */
-.price-note {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-  min-height: 18px;
-  transition: opacity 0.25s ease;
-}
+.plan.featured .plan-price { color: var(--lime); }
 
 /* ── TESTIMONIALS ── */
-.testimonial .stars {
-  color: #f59e0b;
-  font-size: 18px;
-  margin-bottom: 12px;
-  display: flex;
-  gap: 3px;
-}
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
-.star { display: inline-block; }
-
-.card.visible .star {
-  animation: starPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+.tcard {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 30px;
+  opacity: 0; transform: translateY(24px);
 }
-.card.visible .star:nth-child(1) { animation-delay: 0.05s; }
-.card.visible .star:nth-child(2) { animation-delay: 0.12s; }
-.card.visible .star:nth-child(3) { animation-delay: 0.19s; }
-.card.visible .star:nth-child(4) { animation-delay: 0.26s; }
-.card.visible .star:nth-child(5) { animation-delay: 0.33s; }
-
-@keyframes starPop {
-  from { transform: scale(0) rotate(-20deg); opacity: 0; }
-  to   { transform: scale(1) rotate(0); opacity: 1; }
+.tcard.visible { animation: cardIn .55s var(--ease-spring) both; }
+.tcard-stars { display: flex; gap: 2px; margin-bottom: 16px; color: var(--lime); font-size: 14px; }
+.tcard blockquote { font-size: 14px; color: var(--text-secondary); line-height: 1.75; font-style: italic; margin-bottom: 20px; }
+.tcard-author { display: flex; align-items: center; gap: 10px; }
+.author-av {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--lime); color: var(--lime-text);
+  font-size: 12px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
+.author-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.author-loc  { font-size: 11px; color: var(--text-muted); }
 
-.testimonial blockquote { color: var(--muted); font-style: italic; line-height: 1.7; }
-.testimonial .author {
-  margin-top: 16px;
-  font-weight: 700;
-  font-size: 13px;
-  color: #444;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* ── CTA STRIP ── */
+.cta-strip {
+  margin: 0 5% 100px; background: var(--cta-bg);
+  border-radius: 8px; padding: 72px 8%;
+  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  position: relative; overflow: hidden;
 }
+.cta-strip::before {
+  content: 'TRAIN'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+  font-family: var(--ff-display); font-size: 140px; font-weight: 900;
+  color: rgba(0,0,0,.07); pointer-events: none; white-space: nowrap; line-height: 1;
+}
+.cta-text h2 {
+  font-family: var(--ff-display); font-size: clamp(26px, 4vw, 44px);
+  font-weight: 900; letter-spacing: -1px; text-transform: uppercase;
+  color: var(--cta-text); margin-bottom: 8px;
+}
+.cta-text p { font-size: 15px; color: var(--cta-sub); font-weight: 500; }
 
-.author-avatar {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), #3b82f6);
-  display: flex; align-items: center; justify-content: center;
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  flex-shrink: 0;
+.btn-dark {
+  display: inline-block; padding: 14px 32px;
+  background: var(--cta-btn-bg); color: var(--cta-btn-color) !important;
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  text-decoration: none; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  transition: opacity .2s, transform .15s;
 }
-
-/* ── CTA ── */
-.cta-section {
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
-  border-radius: 28px;
-  margin: 0 8% 80px;
-  padding: 80px 8%;
-  text-align: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  top: -50%; left: -30%;
-  width: 80%; height: 200%;
-  background: radial-gradient(ellipse, rgba(255,255,255,0.08) 0%, transparent 65%);
-  animation: ctaPulse 5s ease-in-out infinite;
-}
-
-.cta-section::after {
-  content: '';
-  position: absolute;
-  bottom: -40%; right: -20%;
-  width: 60%; height: 180%;
-  background: radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 65%);
-  animation: ctaPulse 5s 2.5s ease-in-out infinite;
-}
-
-@keyframes ctaPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.cta-section h2 { font-size: 40px; margin-bottom: 14px; position: relative; z-index: 1; }
-.cta-section p { font-size: 17px; opacity: 0.85; margin-bottom: 32px; position: relative; z-index: 1; }
-
-.btn-white {
-  background: white;
-  color: var(--blue);
-  font-weight: 700;
-  position: relative;
-  z-index: 1;
-}
-.btn-white:hover {
-  background: #f1f5f9;
-  box-shadow: 0 8px 30px rgba(0,0,0,.2);
-}
+.btn-dark:hover { opacity: 0.85; transform: translateY(-2px); }
 
 /* ── FOOTER ── */
 footer {
-  background: #0f172a;
-  color: white;
-  padding: 50px;
-  text-align: center;
+  background: var(--footer-bg); border-top: 1px solid var(--footer-border);
+  padding: 48px 5%; display: flex; align-items: center;
+  justify-content: space-between; gap: 20px; flex-wrap: wrap;
+}
+.footer-logo { font-family: var(--ff-display); font-size: 16px; font-weight: 900; text-transform: uppercase; color: #ffffff; }
+.footer-logo span { color: var(--lime); }
+.footer-copy { font-size: 13px; color: #64748b; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a {
+  text-decoration: none; color: #64748b; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.5px; text-transform: uppercase; transition: color .2s;
+}
+.footer-links a:hover { color: var(--lime); }
+
+/* ── BILLING PERIOD SWITCHER ── */
+.billing-switcher {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 48px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 5px;
+  width: fit-content; margin-left: auto; margin-right: auto;
 }
 
-footer h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #93c5fd, #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.billing-btn {
+  position: relative;
+  padding: 9px 22px;
+  border: none; background: transparent;
+  color: var(--text-muted);
+  font-family: var(--ff-body);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.4px; text-transform: uppercase;
+  cursor: pointer; border-radius: 7px;
+  transition: color .2s, background .2s;
+  white-space: nowrap;
 }
 
-footer p { color: #64748b; font-size: 14px; }
+.billing-btn.active {
+  background: var(--lime);
+  color: var(--lime-text);
+}
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
+.billing-btn:not(.active):hover { color: var(--text-primary); }
+
+.billing-save-badge {
+  position: absolute; top: -10px; right: -8px;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--lime);
+  color: var(--lime);
+  font-size: 9px; font-weight: 900;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 20px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Price animation */
+.plan-price-wrap { position: relative; overflow: hidden; }
+.plan-price { transition: opacity .2s, transform .2s; }
+.plan-price.switching { opacity: 0; transform: translateY(-6px); }
+
+.plan-orig {
+  font-size: 13px; color: var(--text-muted);
+  text-decoration: line-through;
+  margin-bottom: 2px; display: block;
+  min-height: 18px;
+  transition: opacity .2s;
+}
+
+.plan-total {
+  font-size: 12px; color: var(--lime);
+  font-weight: 700; margin-bottom: 4px;
+  display: block; min-height: 16px;
+  transition: opacity .2s;
 }
 
 /* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .trainers-grid { grid-template-columns: repeat(2, 1fr); }
+  .programs-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 900px) {
-  .hero { gap: 40px; }
-  .hero h1 { font-size: 44px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero::before { display: none; }
+  .hero-text { padding: 60px 0 0; }
+  .hero-visual { padding: 40px 0 60px; max-width: 420px; }
+  .hero-chip { left: 0; bottom: 60px; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .cta-strip { flex-direction: column; align-items: flex-start; }
+  footer { flex-direction: column; align-items: flex-start; }
 }
 
 @media (max-width: 768px) {
-  header { padding: 16px 5%; }
   nav { display: none; }
   .hamburger { display: flex; }
   .mobile-nav { display: flex; }
-
-  .hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 50px 5%;
-    min-height: auto;
-    gap: 36px;
-  }
-
-  .hero h1 { font-size: 36px; }
-  .hero p { font-size: 16px; }
-  .buttons { justify-content: center; }
-  .stats { justify-content: center; flex-wrap: wrap; }
-  .stats .stat-item + .stat-item { border-left: none; padding-left: 0; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
-  section { padding: 60px 5%; }
-  .title h2 { font-size: 26px; }
-  .pricing { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
-  .cta-section { margin: 0 5% 60px; padding: 50px 6%; border-radius: 20px; }
-  .cta-section h2 { font-size: 28px; }
-  footer { padding: 40px 5%; }
-  .hero-badge { left: 0; bottom: -14px; }
-  .hero-badge2 { right: 0; }
+  .hero h1 { font-size: 38px; }
+  .hero-stats { flex-wrap: wrap; gap: 20px; }
+  .hstat { border-right: none; margin-right: 0; padding-right: 0; min-width: 100px; }
+  .programs-grid { grid-template-columns: 1fr; }
+  .stats-band-grid { grid-template-columns: repeat(2, 1fr); }
+  .sb-item { border-right: none; padding: 20px; border-bottom: 1px solid var(--stats-band-div); }
+  .sb-item:last-child, .sb-item:nth-child(even) { border-right: none; }
+  .sb-item:nth-last-child(-n+2) { border-bottom: none; }
+  .trainers-grid { grid-template-columns: 1fr; }
+  .section { padding: 70px 5%; }
+  .cta-strip { margin: 0 5% 70px; padding: 48px 6%; }
+  .footer-links { display: none; }
 }
 
 @media (max-width: 480px) {
-  .logo { font-size: 20px; }
-  .hero h1 { font-size: 30px; }
-  .cards { grid-template-columns: 1fr; }
-  .trainers { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-  .stat-num-banner { font-size: 32px; }
+  .hero-rating { right: 0; }
+  .header-right { gap: 10px; }
 }
 
 </style>
 </head>
 <body>
 
-<!-- Scroll progress -->
 <div class="progress-bar" id="progress-bar"></div>
-<!-- Cursor glow -->
-<div class="cursor-glow" id="cursor-glow"></div>
-<!-- Particles -->
-<div class="particle" style="left:8%;width:7px;height:7px;animation-duration:13s;animation-delay:0s;"></div>
-<div class="particle" style="left:22%;width:5px;height:5px;animation-duration:16s;animation-delay:3s;"></div>
-<div class="particle" style="left:52%;width:9px;height:9px;animation-duration:19s;animation-delay:6s;"></div>
-<div class="particle" style="left:73%;width:6px;height:6px;animation-duration:14s;animation-delay:1.5s;"></div>
-<div class="particle" style="left:90%;width:4px;height:4px;animation-duration:21s;animation-delay:9s;"></div>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">EliteFitness</div>
+  <div class="logo">Elite<span>Fit</span></div>
   <nav>
     <a href="#">Home</a>
-    <a href="#">About</a>
     <a href="#">Programs</a>
-    <a href="#">Membership</a>
     <a href="#">Trainers</a>
-    <a href="#">Contact</a>
+    <a href="#">Membership</a>
   </nav>
-  <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-    <span></span><span></span><span></span>
-  </button>
-  <a href="#" class="btn">Join Now</a>
+  <div class="header-right">
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark">
+      <div class="toggle-icons">
+        <span class="toggle-sun">☀</span>
+        <span class="toggle-moon">☽</span>
+      </div>
+      <div class="toggle-knob"></div>
+    </button>
+    <a href="#" class="nav-cta" style="text-decoration:none;border-radius:6px;padding:9px 22px;font-weight:800;font-size:12px;letter-spacing:0.5px;background:var(--lime);color:var(--lime-text);">Join Now</a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </header>
 
 <nav class="mobile-nav" id="mobile-nav">
   <a href="#">Home</a>
-  <a href="#">About</a>
   <a href="#">Programs</a>
-  <a href="#">Membership</a>
   <a href="#">Trainers</a>
-  <a href="#">Contact</a>
+  <a href="#">Membership</a>
+  <a href="#" class="m-cta">Join Now →</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-text">
-    <h5>🏋 Fitness Club</h5>
-    <h1>Build Your <span>Dream Body</span> With Expert Trainers</h1>
-    <p>Join Elite Fitness and achieve your goals with modern equipment, certified trainers, group classes, personal coaching, and customized diet plans.</p>
-    <div class="buttons">
-      <a href="#" class="btn">Start Free Trial</a>
-      <a href="#" class="secondary">View Membership →</a>
+    <div class="hero-eyebrow">Fitness Club · Est. 2015</div>
+    <h1>Build A<em>Stronger</em>You.</h1>
+    <p class="hero-desc">Modern equipment, certified trainers, and real programming — everything you need to stop starting over and start getting results.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Start Free Trial</a>
+      <a href="#" class="btn-outline">View Plans</a>
     </div>
-    <div class="stats">
-      <div class="stat-item">
-        <h2 class="counter" data-target="1500" data-suffix="+">0</h2>
-        <p>Happy Members</p>
+    <div class="hero-stats">
+      <div class="hstat">
+        <span class="hstat-num counter" data-target="1500" data-suffix="+">0</span>
+        <span class="hstat-label">Members</span>
       </div>
-      <div class="stat-item">
-        <h2 class="counter" data-target="15" data-suffix="+">0</h2>
-        <p>Expert Trainers</p>
+      <div class="hstat">
+        <span class="hstat-num counter" data-target="15" data-suffix="+">0</span>
+        <span class="hstat-label">Trainers</span>
       </div>
-      <div class="stat-item">
-        <h2 class="counter" data-target="10" data-suffix="+">0</h2>
-        <p>Fitness Programs</p>
+      <div class="hstat">
+        <span class="hstat-num counter" data-target="98" data-suffix="%">0</span>
+        <span class="hstat-label">Goal rate</span>
       </div>
     </div>
   </div>
 
-  <div class="hero-image-wrap" id="hero-image-wrap">
-    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900" alt="Elite Fitness Gym">
-    <div class="hero-badge">
-      <div class="badge-icon">🔥</div>
-      <div class="badge-text">
-        <div class="badge-num">500+</div>
-        <div class="badge-label">Classes monthly</div>
+  <div class="hero-visual" id="hero-visual">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900" alt="Elite Fitness training floor">
+    <div class="hero-chip">
+      <div>
+        <div class="chip-num">500+</div>
+        <div class="chip-label">Classes/mo</div>
       </div>
     </div>
-    <div class="hero-badge2">
-      <div class="badge-icon2">⭐</div>
-      <div class="badge-text">
-        <div class="badge-num">4.9/5</div>
-        <div class="badge-label">Member rating</div>
+    <div class="hero-rating">
+      <div style="font-size:20px;">⭐</div>
+      <div>
+        <div class="rating-val">4.9/5</div>
+        <div class="rating-sub">Member rating</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- PROGRAMS -->
-<section>
-  <div class="title">
-    <div class="section-label">Programs</div>
-    <h2>Train With Purpose</h2>
-    <p>From weight loss to athletic performance — we have a program built for your goal.</p>
+<section class="section section-dark">
+  <div class="section-header">
+    <div class="eyebrow">Programs</div>
+    <h2 class="section-title">Train With<br>Purpose</h2>
+    <p class="section-sub">From fat loss to athletic performance — structured programs that actually move the needle.</p>
   </div>
-  <div class="cards">
-    <div class="card">
-      <div class="card-icon">💪</div>
-      <h3>Strength Training</h3>
-      <p>Build muscle and power with structured progressive overload programs led by certified coaches.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🏃</div>
-      <h3>Cardio & HIIT</h3>
-      <p>Burn fat fast with high-intensity interval sessions designed for maximum calorie torching.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🧘</div>
-      <h3>Yoga & Flexibility</h3>
-      <p>Improve mobility, reduce stress, and build body awareness through guided yoga flows.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🥊</div>
-      <h3>Boxing & MMA</h3>
-      <p>Sharpen reflexes and build functional fitness through combat-inspired conditioning.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🥗</div>
-      <h3>Nutrition Coaching</h3>
-      <p>Customized meal plans and ongoing dietary support from certified nutritionists.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">👤</div>
-      <h3>Personal Training</h3>
-      <p>One-on-one sessions with your dedicated trainer, fully tailored to your schedule and goals.</p>
-    </div>
+  <div class="programs-grid">
+    <div class="prog-card"><span class="prog-num">01</span><span class="prog-icon">💪</span><h3>Strength Training</h3><p>Progressive overload programs built around the big lifts, led by certified strength coaches.</p></div>
+    <div class="prog-card"><span class="prog-num">02</span><span class="prog-icon">🏃</span><h3>Cardio & HIIT</h3><p>High-intensity intervals designed for maximum calorie burn in minimum time.</p></div>
+    <div class="prog-card"><span class="prog-num">03</span><span class="prog-icon">🧘</span><h3>Yoga & Flexibility</h3><p>Guided flows that improve mobility, reduce injury risk, and sharpen body awareness.</p></div>
+    <div class="prog-card"><span class="prog-num">04</span><span class="prog-icon">🥊</span><h3>Boxing & MMA</h3><p>Combat-inspired conditioning that builds reflexes, power, and mental toughness.</p></div>
+    <div class="prog-card"><span class="prog-num">05</span><span class="prog-icon">🥗</span><h3>Nutrition Coaching</h3><p>Personalised meal plans and ongoing support from certified nutritionists.</p></div>
+    <div class="prog-card"><span class="prog-num">06</span><span class="prog-icon">👤</span><h3>Personal Training</h3><p>One-on-one sessions with a dedicated trainer, fully tailored to your goals and schedule.</p></div>
   </div>
 </section>
 
-<!-- STATS BANNER -->
-<section class="stats-section">
-  <div class="stats-grid">
-    <div class="stat-item-banner">
-      <span class="stat-num-banner" data-target="1500" data-suffix="+">0</span>
-      <span class="stat-label-banner">Happy Members</span>
-    </div>
-    <div class="stat-item-banner">
-      <span class="stat-num-banner" data-target="15" data-suffix="+">0</span>
-      <span class="stat-label-banner">Expert Trainers</span>
-    </div>
-    <div class="stat-item-banner">
-      <span class="stat-num-banner" data-target="10" data-suffix="+">0</span>
-      <span class="stat-label-banner">Programs</span>
-    </div>
-    <div class="stat-item-banner">
-      <span class="stat-num-banner" data-target="98" data-suffix="%">0</span>
-      <span class="stat-label-banner">Goal Achievement</span>
-    </div>
+<!-- STATS BAND -->
+<div class="stats-band">
+  <div class="stats-band-grid">
+    <div class="sb-item"><span class="sb-num" data-target="1500" data-suffix="+">0</span><span class="sb-label">Happy Members</span></div>
+    <div class="sb-item"><span class="sb-num" data-target="15" data-suffix="+">0</span><span class="sb-label">Expert Trainers</span></div>
+    <div class="sb-item"><span class="sb-num" data-target="10" data-suffix="+">0</span><span class="sb-label">Programs</span></div>
+    <div class="sb-item"><span class="sb-num" data-target="98" data-suffix="%">0</span><span class="sb-label">Goal Achievement</span></div>
   </div>
-</section>
+</div>
 
 <!-- TRAINERS -->
-<section>
-  <div class="title">
-    <div class="section-label">Trainers</div>
-    <h2>Meet Your Coaches</h2>
-    <p>Certified experts passionate about transforming your fitness journey.</p>
+<section class="section section-dark">
+  <div class="section-header center">
+    <div class="eyebrow">Trainers</div>
+    <h2 class="section-title">Meet Your Coaches</h2>
+    <p class="section-sub">Certified experts who have been where you are — and know exactly how to get you where you want to go.</p>
   </div>
-  <div class="trainers">
-    <div class="trainer-card">
-      <img class="trainer-img" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="Trainer Arjun">
-      <div class="trainer-info">
-        <h3>Arjun Sharma</h3>
-        <div class="role">Strength & Conditioning</div>
-        <p>10 years coaching competitive athletes. Specialises in powerlifting and functional movement.</p>
-      </div>
-    </div>
-    <div class="trainer-card">
-      <img class="trainer-img" src="https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400" alt="Trainer Priya">
-      <div class="trainer-info">
-        <h3>Priya Nair</h3>
-        <div class="role">Yoga & Nutrition</div>
-        <p>Certified yoga instructor and dietician. Helps clients balance body, mind, and plate.</p>
-      </div>
-    </div>
-    <div class="trainer-card">
-      <img class="trainer-img" src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400" alt="Trainer Vikram">
-      <div class="trainer-info">
-        <h3>Vikram Rao</h3>
-        <div class="role">HIIT & Boxing</div>
-        <p>Former competitive boxer turned HIIT coach. Brings intensity and technique to every session.</p>
-      </div>
-    </div>
-    <div class="trainer-card">
-      <img class="trainer-img" src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=400" alt="Trainer Meena">
-      <div class="trainer-info">
-        <h3>Meena Krishnan</h3>
-        <div class="role">Personal Training</div>
-        <p>Specialises in weight management and postural correction for desk workers and athletes alike.</p>
-      </div>
-    </div>
+  <div class="trainers-grid">
+    <div class="trainer-card"><div class="trainer-img-wrap"><img class="trainer-img" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="Arjun Sharma"></div><div class="trainer-body"><h3>Arjun Sharma</h3><span class="trainer-role">Strength & Conditioning</span><p>10 years coaching competitive athletes. Specialises in powerlifting and functional movement.</p></div></div>
+    <div class="trainer-card"><div class="trainer-img-wrap"><img class="trainer-img" src="https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400" alt="Priya Nair"></div><div class="trainer-body"><h3>Priya Nair</h3><span class="trainer-role">Yoga & Nutrition</span><p>Certified yoga instructor and dietician. Helps clients balance body, mind, and plate.</p></div></div>
+    <div class="trainer-card"><div class="trainer-img-wrap"><img class="trainer-img" src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400" alt="Vikram Rao"></div><div class="trainer-body"><h3>Vikram Rao</h3><span class="trainer-role">HIIT & Boxing</span><p>Former competitive boxer turned HIIT coach. Brings intensity and technique to every session.</p></div></div>
+    <div class="trainer-card"><div class="trainer-img-wrap"><img class="trainer-img" src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=400" alt="Meena Krishnan"></div><div class="trainer-body"><h3>Meena Krishnan</h3><span class="trainer-role">Personal Training</span><p>Specialises in weight management and postural correction for desk workers and athletes alike.</p></div></div>
   </div>
 </section>
 
 <!-- PRICING -->
-<section>
-  <div class="title">
-    <div class="section-label">Membership</div>
-    <h2>Plans for Every Goal</h2>
-    <p>No lock-ins. No surprises. Just results.</p>
+<section class="section section-mid">
+  <div class="section-header center">
+    <div class="eyebrow">Membership</div>
+    <h2 class="section-title">Plans for<br>Every Goal</h2>
+    <p class="section-sub">No lock-ins. No surprises. Cancel any time.</p>
   </div>
 
-  <!-- Billing Toggle -->
-  <div class="billing-toggle" id="billing-toggle">
-    <button class="active" data-plan="monthly">Monthly</button>
-    <button data-plan="quarterly">3 Months <span class="save-badge">10% off</span></button>
-    <button data-plan="biannual">6 Months <span class="save-badge">20% off</span></button>
-    <button data-plan="yearly">Yearly <span class="save-badge">30% off</span></button>
+  <!-- Billing period switcher -->
+  <div class="billing-switcher" id="billing-switcher">
+    <button class="billing-btn active" data-period="1">1 Month</button>
+    <button class="billing-btn" data-period="6">
+      6 Months
+      <span class="billing-save-badge">Save 10%</span>
+    </button>
+    <button class="billing-btn" data-period="12">
+      1 Year
+      <span class="billing-save-badge">Save 20%</span>
+    </button>
   </div>
 
-  <div class="pricing">
+  <div class="pricing-grid">
+
     <!-- BASIC -->
-    <div class="price">
-      <h3>Basic</h3>
-      <h2 class="price-amount" id="price-basic">
-        ₹799<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
-      </h2>
-      <p class="price-note" id="note-basic"></p>
-      <ul class="price-features">
+    <div class="plan"
+      data-price-1="799"   data-total-1=""
+      data-price-6="719"   data-total-6="₹4,314 billed every 6 months"
+      data-price-12="639"  data-total-12="₹7,668 billed annually">
+      <span class="plan-name">Basic</span>
+      <div class="plan-price-wrap">
+        <span class="plan-orig"></span>
+        <div class="plan-price">₹799</div>
+        <span class="plan-total"></span>
+      </div>
+      <span class="plan-period">per month</span>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
         <li>Gym Floor Access</li>
         <li>Locker Room</li>
-        <li>2 Group Classes/week</li>
+        <li>2 Group Classes / week</li>
         <li>App & Progress Tracking</li>
       </ul>
-      <a class="btn" href="#">Get Started</a>
+      <a href="#" class="btn-outline" style="display:block;text-align:center;">Get Started</a>
     </div>
 
     <!-- PRO -->
-    <div class="price popular">
-      <h3>Pro</h3>
-      <h2 class="price-amount" id="price-pro">
-        ₹1799<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
-      </h2>
-      <p class="price-note" id="note-pro"></p>
-      <ul class="price-features">
+    <div class="plan featured"
+      data-price-1="1799"  data-total-1=""
+      data-price-6="1619"  data-total-6="₹9,714 billed every 6 months"
+      data-price-12="1439" data-total-12="₹17,268 billed annually">
+      <div class="plan-badge">Most Popular</div>
+      <span class="plan-name">Pro</span>
+      <div class="plan-price-wrap">
+        <span class="plan-orig"></span>
+        <div class="plan-price">₹1799</div>
+        <span class="plan-total"></span>
+      </div>
+      <span class="plan-period">per month</span>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
         <li>Everything in Basic</li>
         <li>Unlimited Group Classes</li>
-        <li>4 Personal Sessions/mo</li>
+        <li>4 Personal Sessions / mo</li>
         <li>Nutrition Guidance</li>
       </ul>
-      <a class="btn" href="#">Get Started</a>
+      <a href="#" class="btn-primary" style="display:block;text-align:center;">Get Started</a>
     </div>
 
     <!-- ELITE -->
-    <div class="price">
-      <h3>Elite</h3>
-      <h2 class="price-amount" id="price-elite">
-        ₹3499<span style="font-size:16px;color:#888;font-weight:400">/mo</span>
-      </h2>
-      <p class="price-note" id="note-elite"></p>
-      <ul class="price-features">
+    <div class="plan"
+      data-price-1="3499"  data-total-1=""
+      data-price-6="3149"  data-total-6="₹18,894 billed every 6 months"
+      data-price-12="2799" data-total-12="₹33,588 billed annually">
+      <span class="plan-name">Elite</span>
+      <div class="plan-price-wrap">
+        <span class="plan-orig"></span>
+        <div class="plan-price">₹3499</div>
+        <span class="plan-total"></span>
+      </div>
+      <span class="plan-period">per month</span>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
         <li>Everything in Pro</li>
         <li>Dedicated Personal Trainer</li>
         <li>Custom Diet Plan</li>
         <li>Priority Scheduling</li>
       </ul>
-      <a class="btn" href="#">Get Started</a>
+      <a href="#" class="btn-outline" style="display:block;text-align:center;">Get Started</a>
     </div>
+
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section>
-  <div class="title">
-    <div class="section-label">Reviews</div>
-    <h2>What Our Members Say</h2>
+<section class="section section-dark">
+  <div class="section-header center">
+    <div class="eyebrow">Reviews</div>
+    <h2 class="section-title">What Members Say</h2>
   </div>
-  <div class="cards">
-    <div class="card testimonial">
-      <div class="stars">
-        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-      </div>
-      <blockquote>"Lost 12 kg in 3 months. The trainers are incredibly motivating and the programs actually work."</blockquote>
-      <div class="author">
-        <div class="author-avatar">SK</div>
-        Suresh K., Chennai
-      </div>
-    </div>
-    <div class="card testimonial">
-      <div class="stars">
-        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-      </div>
-      <blockquote>"Best gym experience I've had. The yoga and nutrition coaching changed my lifestyle completely."</blockquote>
-      <div class="author">
-        <div class="author-avatar">DV</div>
-        Divya V., Bangalore
-      </div>
-    </div>
-    <div class="card testimonial">
-      <div class="stars">
-        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-      </div>
-      <blockquote>"The HIIT classes are intense in the best way. I've never felt stronger or faster."</blockquote>
-      <div class="author">
-        <div class="author-avatar">TM</div>
-        Tarun M., Hyderabad
-      </div>
-    </div>
+  <div class="testimonials-grid">
+    <div class="tcard"><div class="tcard-stars">★★★★★</div><blockquote>"Lost 12 kg in 3 months. The trainers are incredibly motivating and the programs actually work."</blockquote><div class="tcard-author"><div class="author-av">SK</div><div><div class="author-name">Suresh K.</div><div class="author-loc">Chennai</div></div></div></div>
+    <div class="tcard"><div class="tcard-stars">★★★★★</div><blockquote>"Best gym experience I've had. The yoga and nutrition coaching changed my lifestyle completely."</blockquote><div class="tcard-author"><div class="author-av">DV</div><div><div class="author-name">Divya V.</div><div class="author-loc">Bangalore</div></div></div></div>
+    <div class="tcard"><div class="tcard-stars">★★★★★</div><blockquote>"The HIIT classes are intense in the best way. I've never felt stronger or faster in my life."</blockquote><div class="tcard-author"><div class="author-av">TM</div><div><div class="author-name">Tarun M.</div><div class="author-loc">Hyderabad</div></div></div></div>
   </div>
 </section>
 
-<!-- CTA -->
-<div class="cta-section">
-  <h2>Ready to Start Your Journey?</h2>
-  <p>Join 1,500+ members who are already transforming their lives at Elite Fitness.</p>
-  <a class="btn btn-white" href="#">Start Free Trial Today</a>
+<!-- CTA STRIP -->
+<div class="cta-strip">
+  <div class="cta-text">
+    <h2>Ready to Start?</h2>
+    <p>Join 1,500+ members already transforming their lives.</p>
+  </div>
+  <a href="#" class="btn-dark">Start Free Trial Today</a>
 </div>
 
+<!-- FOOTER -->
 <footer>
-  <h3>Elite Fitness</h3>
-  <br>
-  <p>© 2026 Elite Fitness. All Rights Reserved.</p>
+  <div class="footer-logo">Elite<span>Fit</span></div>
+  <div class="footer-copy">© 2026 EliteFitness. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
 </footer>
 
 <script>
 // ── Scroll progress
 const progressBar = document.getElementById('progress-bar');
 window.addEventListener('scroll', () => {
-  const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-  progressBar.style.width = scrolled + '%';
-});
+  progressBar.style.width = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100) + '%';
+}, { passive: true });
 
-// ── Cursor glow
-const glow = document.getElementById('cursor-glow');
-let glowX = 0, glowY = 0, mouseX = 0, mouseY = 0;
-document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-function animateGlow() {
-  glowX += (mouseX - glowX) * 0.08;
-  glowY += (mouseY - glowY) * 0.08;
-  glow.style.left = glowX + 'px';
-  glow.style.top = glowY + 'px';
-  requestAnimationFrame(animateGlow);
-}
-animateGlow();
+// ── Theme toggle
+const html = document.documentElement;
+const toggleBtn = document.getElementById('theme-toggle');
+
+// Restore saved preference, then fallback to system
+const saved = localStorage.getItem('ef-theme');
+const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const initial = saved || (sysDark ? 'dark' : 'light');
+html.setAttribute('data-theme', initial);
+
+toggleBtn.addEventListener('click', () => {
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('ef-theme', next);
+});
 
 // ── Hamburger
 const hamburger = document.getElementById('hamburger');
@@ -1313,141 +1017,110 @@ hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('open');
   mobileNav.classList.toggle('open');
 });
-mobileNav.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    mobileNav.classList.remove('open');
-  });
-});
-
-// ── Header shadow on scroll
-const header = document.querySelector('header');
-window.addEventListener('scroll', () => {
-  header.style.boxShadow = window.scrollY > 10
-    ? '0 4px 24px rgba(0,0,0,.12)'
-    : '0 2px 8px rgba(0,0,0,.06)';
-});
-
-// ── Ripple on buttons
-document.querySelectorAll('.btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
-    btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-  });
-});
+mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+  hamburger.classList.remove('open');
+  mobileNav.classList.remove('open');
+}));
 
 // ── Counter animation
 function animateCounter(el, target, suffix) {
-  const duration = 1600;
-  const start = performance.now();
-  function update(time) {
-    const eased = 1 - Math.pow(1 - Math.min((time - start) / duration, 1), 3);
-    const value = Math.round(eased * target);
-    el.textContent = value.toLocaleString() + (suffix || '');
-    if (eased < 1) requestAnimationFrame(update);
-  }
-  requestAnimationFrame(update);
+  const duration = 1500, start = performance.now();
+  (function update(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target).toLocaleString() + (suffix || '');
+    if (t < 1) requestAnimationFrame(update);
+  })(start);
 }
 
-// ── Hero stat counters
+// Hero counters
 setTimeout(() => {
-  document.querySelectorAll('.stats .counter[data-target]').forEach(el => {
+  document.querySelectorAll('.hstat .counter[data-target]').forEach(el => {
     animateCounter(el, parseInt(el.dataset.target), el.dataset.suffix || '');
   });
-}, 900);
+}, 800);
 
-// ── Intersection observer
-const revealEls = document.querySelectorAll('.card, .price, .stat-item-banner, .trainer-card');
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      const siblings = [...entry.target.parentElement.children];
-      const delay = siblings.indexOf(entry.target) * 90;
-      setTimeout(() => {
-        entry.target.classList.add('visible');
-        const counterEl = entry.target.querySelector('[data-target]');
-        if (counterEl) {
-          animateCounter(counterEl, parseInt(counterEl.dataset.target), counterEl.dataset.suffix || '');
-        }
-      }, delay);
-      observer.unobserve(entry.target);
-    }
+// Intersection observer
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const idx = [...entry.target.parentElement.children].indexOf(entry.target);
+    setTimeout(() => {
+      entry.target.classList.add('visible');
+      const counter = entry.target.querySelector('[data-target]');
+      if (counter) animateCounter(counter, parseInt(counter.dataset.target), counter.dataset.suffix || '');
+    }, idx * 80);
+    io.unobserve(entry.target);
   });
-}, { threshold: 0.15 });
+}, { threshold: 0.12 });
 
-revealEls.forEach(el => observer.observe(el));
+document.querySelectorAll('.prog-card, .sb-item, .trainer-card, .plan, .tcard').forEach(el => io.observe(el));
 
-// ── Billing toggle
-const plans = {
-  monthly:   { months: 1,  discount: 0 },
-  quarterly: { months: 3,  discount: 0.10 },
-  biannual:  { months: 6,  discount: 0.20 },
-  yearly:    { months: 12, discount: 0.30 }
-};
+// ── Billing period switcher
+const billingBtns = document.querySelectorAll('.billing-btn');
+const plans = document.querySelectorAll('.plan[data-price-1]');
+let activePeriod = 1;
 
-const basePrices = { basic: 799, pro: 1799, elite: 3499 };
+function updatePricing(period) {
+  plans.forEach(plan => {
+    const price     = parseInt(plan.dataset[`price${period}`], 10);
+    const total     = plan.dataset[`total${period}`] || '';
+    const origPrice = parseInt(plan.dataset['price1'], 10);
 
-const labels = { monthly: 'mo', quarterly: '3 mo', biannual: '6 mo', yearly: 'yr' };
-
-function updatePricing(planKey) {
-  const { months, discount } = plans[planKey];
-  const label = labels[planKey];
-
-  ['basic', 'pro', 'elite'].forEach(tier => {
-    const priceEl = document.getElementById('price-' + tier);
-    const noteEl  = document.getElementById('note-' + tier);
-    const base = basePrices[tier];
-    const monthly = Math.round(base * (1 - discount));
-    const total   = monthly * months;
+    const priceEl = plan.querySelector('.plan-price');
+    const origEl  = plan.querySelector('.plan-orig');
+    const totalEl = plan.querySelector('.plan-total');
 
     // Animate out
     priceEl.classList.add('switching');
+
     setTimeout(() => {
-      if (planKey === 'monthly') {
-        priceEl.innerHTML = `₹${monthly.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/mo</span>`;
-        noteEl.textContent = '';
-      } else if (planKey === 'yearly') {
-        priceEl.innerHTML = `₹${total.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/yr</span>`;
-        noteEl.textContent = `₹${monthly.toLocaleString()}/mo · Save ₹${((base - monthly) * 12).toLocaleString()}`;
-      } else {
-        priceEl.innerHTML = `₹${total.toLocaleString()}<span style="font-size:16px;color:#888;font-weight:400">/${label}</span>`;
-        noteEl.textContent = `₹${monthly.toLocaleString()}/mo · Save ₹${((base - monthly) * months).toLocaleString()}`;
-      }
-      // Animate in
+      priceEl.textContent = '₹' + price.toLocaleString('en-IN');
+      origEl.textContent  = period > 1 ? '₹' + origPrice.toLocaleString('en-IN') : '';
+      totalEl.textContent = total;
       priceEl.classList.remove('switching');
-    }, 250);
+    }, 150);
   });
 }
 
-document.getElementById('billing-toggle').addEventListener('click', (e) => {
-  const btn = e.target.closest('button');
-  if (!btn) return;
-  document.querySelectorAll('#billing-toggle button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updatePricing(btn.dataset.plan);
+billingBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    billingBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activePeriod = parseInt(btn.dataset.period, 10);
+    updatePricing(activePeriod);
+  });
 });
 
-// ── Hero image tilt
-const heroImgWrap = document.getElementById('hero-image-wrap');
-if (heroImgWrap) {
-  heroImgWrap.addEventListener('mousemove', (e) => {
-    const rect = heroImgWrap.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    heroImgWrap.querySelector('img').style.transform =
-      `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 6}deg) scale(1.02)`;
-  });
-  heroImgWrap.addEventListener('mouseleave', () => {
-    heroImgWrap.querySelector('img').style.transform = '';
-  });
-}
-</script>
+// Render correct prices immediately on load (no animation)
+//hey
+plans.forEach(plan => {
+    const price = parseInt(plan.getAttribute('data-price-1'), 10);
 
+    plan.querySelector('.plan-price').textContent =
+        '₹' + price.toLocaleString('en-IN');
+
+    plan.querySelector('.plan-orig').textContent = '';
+    plan.querySelector('.plan-total').textContent = '';
+});
+
+// Ripple
+document.querySelectorAll('.btn-primary, .btn-dark').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    const r = document.createElement('span');
+    const rect = this.getBoundingClientRect(), sz = Math.max(rect.width, rect.height);
+    r.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:rpl .6s linear;pointer-events:none;`;
+    if (!document.getElementById('rpl-style')) {
+      const s = document.createElement('style');
+      s.id = 'rpl-style';
+      s.textContent = '@keyframes rpl{to{transform:scale(4);opacity:0;}}';
+      document.head.appendChild(s);
+    }
+    this.style.position = 'relative'; this.style.overflow = 'hidden';
+    this.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+});
+</script>
 </body>
 </html>
