@@ -1,23 +1,24 @@
 -- ============================================================
 -- GYM ADMIN — FULL DATABASE SCHEMA
 -- ============================================================
-
--- EXTENSIONS
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgvector"; -- for AI RAG chatbot
+-- EXTENSIONS
+-- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- CREATE EXTENSION IF NOT EXISTS "pgvector"; -- for AI RAG chatbot
 
 -- ============================================================
 -- 1. ROLES & PERMISSIONS (RBAC)
 -- ============================================================
 CREATE TABLE roles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) UNIQUE NOT NULL, -- owner, manager, trainer, front-desk, accountant
     description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE permissions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     module VARCHAR(100) NOT NULL,      -- members, payments, reports, etc.
     action VARCHAR(50) NOT NULL,       -- create, read, update, delete
     description TEXT,
@@ -34,7 +35,7 @@ CREATE TABLE role_permissions (
 -- 2. USERS
 -- ============================================================
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     role_id UUID REFERENCES roles(id),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
@@ -51,7 +52,7 @@ CREATE TABLE users (
 -- 3. GYMS
 -- ============================================================
 CREATE TABLE gyms (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     owner_id UUID REFERENCES users(id),
     name VARCHAR(200) NOT NULL,
     logo_url TEXT,
@@ -72,7 +73,7 @@ CREATE TABLE gyms (
 -- 4. BRANCHES
 -- ============================================================
 CREATE TABLE branches (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     gym_id UUID REFERENCES gyms(id) ON DELETE CASCADE,
     manager_id UUID REFERENCES users(id),
     name VARCHAR(200) NOT NULL,
@@ -91,7 +92,7 @@ CREATE TABLE branches (
 -- 5. SAAS BILLING (if selling to gym owners)
 -- ============================================================
 CREATE TABLE billing_plans (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,        -- Basic, Pro, Enterprise
     price_monthly NUMERIC(10,2),
     price_yearly NUMERIC(10,2),
@@ -103,7 +104,7 @@ CREATE TABLE billing_plans (
 );
 
 CREATE TABLE subscriptions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     gym_id UUID REFERENCES gyms(id) ON DELETE CASCADE,
     billing_plan_id UUID REFERENCES billing_plans(id),
     status VARCHAR(30) DEFAULT 'active', -- active, cancelled, expired, trial
@@ -119,7 +120,7 @@ CREATE TABLE subscriptions (
 -- 6. MEMBERSHIP PLANS (gym's own plans for members)
 -- ============================================================
 CREATE TABLE membership_plans (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,        -- Monthly, Quarterly, Annual
     description TEXT,
@@ -132,7 +133,7 @@ CREATE TABLE membership_plans (
 );
 
 CREATE TABLE coupons (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     gym_id UUID REFERENCES gyms(id),
     code VARCHAR(50) UNIQUE NOT NULL,
     discount_type VARCHAR(20) NOT NULL,   -- percentage, fixed
@@ -149,7 +150,7 @@ CREATE TABLE coupons (
 -- 7. MEMBERS
 -- ============================================================
 CREATE TABLE members (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id),          -- if they have portal access
     referred_by UUID REFERENCES members(id),    -- referral tracking
@@ -169,7 +170,7 @@ CREATE TABLE members (
 );
 
 CREATE TABLE member_documents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID REFERENCES members(id) ON DELETE CASCADE,
     doc_type VARCHAR(100) NOT NULL,    -- id_proof, medical_certificate, pt_consent
     file_url TEXT NOT NULL,
@@ -180,7 +181,7 @@ CREATE TABLE member_documents (
 -- 8. MEMBER MEMBERSHIPS
 -- ============================================================
 CREATE TABLE member_memberships (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID REFERENCES members(id) ON DELETE CASCADE,
     plan_id UUID REFERENCES membership_plans(id),
     coupon_id UUID REFERENCES coupons(id),
@@ -197,7 +198,7 @@ CREATE TABLE member_memberships (
 -- 9. PAYMENTS & INVOICES
 -- ============================================================
 CREATE TABLE payments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID REFERENCES members(id),
     membership_id UUID REFERENCES member_memberships(id),
     branch_id UUID REFERENCES branches(id),
@@ -212,7 +213,7 @@ CREATE TABLE payments (
 );
 
 CREATE TABLE invoices (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payment_id UUID REFERENCES payments(id),
     member_id UUID REFERENCES members(id),
     invoice_number VARCHAR(100) UNIQUE NOT NULL,
@@ -228,7 +229,7 @@ CREATE TABLE invoices (
 );
 
 CREATE TABLE refunds (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     payment_id UUID REFERENCES payments(id),
     member_id UUID REFERENCES members(id),
     amount NUMERIC(10,2) NOT NULL,
@@ -241,7 +242,7 @@ CREATE TABLE refunds (
 );
 
 CREATE TABLE referrals (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     referrer_id UUID REFERENCES members(id),
     referred_id UUID REFERENCES members(id),
     reward_given BOOLEAN DEFAULT FALSE,
@@ -253,7 +254,7 @@ CREATE TABLE referrals (
 -- 10. STAFF
 -- ============================================================
 CREATE TABLE staff (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id),
     role_id UUID REFERENCES roles(id),
@@ -272,7 +273,7 @@ CREATE TABLE staff (
 -- 11. ATTENDANCE
 -- ============================================================
 CREATE TABLE attendance (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id),
     member_id UUID REFERENCES members(id),
     check_in TIMESTAMPTZ NOT NULL,
@@ -283,7 +284,7 @@ CREATE TABLE attendance (
 );
 
 CREATE TABLE staff_attendance (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     staff_id UUID REFERENCES staff(id) ON DELETE CASCADE,
     branch_id UUID REFERENCES branches(id),
     check_in TIMESTAMPTZ NOT NULL,
@@ -296,7 +297,7 @@ CREATE TABLE staff_attendance (
 -- 12. EXPENSES
 -- ============================================================
 CREATE TABLE expenses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     category VARCHAR(100),             -- rent, utilities, salaries, maintenance
     amount NUMERIC(10,2) NOT NULL,
@@ -311,7 +312,7 @@ CREATE TABLE expenses (
 -- 13. EQUIPMENT & MAINTENANCE
 -- ============================================================
 CREATE TABLE equipment (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,
     category VARCHAR(100),             -- cardio, strength, free_weights
@@ -326,7 +327,7 @@ CREATE TABLE equipment (
 );
 
 CREATE TABLE maintenance_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     equipment_id UUID REFERENCES equipment(id) ON DELETE CASCADE,
     maintenance_type VARCHAR(100),     -- routine, repair, inspection
     description TEXT,
@@ -341,7 +342,7 @@ CREATE TABLE maintenance_logs (
 -- 14. LEADS / CRM
 -- ============================================================
 CREATE TABLE leads (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id),
     full_name VARCHAR(150) NOT NULL,
     email VARCHAR(255),
@@ -359,7 +360,7 @@ CREATE TABLE leads (
 );
 
 CREATE TABLE lead_interactions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
     interaction_type VARCHAR(50),      -- call, message, visit, email
     notes TEXT,
@@ -371,7 +372,7 @@ CREATE TABLE lead_interactions (
 -- 15. TRAINER PORTAL — WORKOUT & DIET PLANS
 -- ============================================================
 CREATE TABLE workout_plans (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID REFERENCES members(id) ON DELETE CASCADE,
     trainer_id UUID REFERENCES staff(id),
     title VARCHAR(150),
@@ -386,7 +387,7 @@ CREATE TABLE workout_plans (
 );
 
 CREATE TABLE diet_plans (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID REFERENCES members(id) ON DELETE CASCADE,
     trainer_id UUID REFERENCES staff(id),
     title VARCHAR(150),
@@ -404,7 +405,7 @@ CREATE TABLE diet_plans (
 -- 16. NOTIFICATIONS
 -- ============================================================
 CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     gym_id UUID REFERENCES gyms(id),
     user_id UUID REFERENCES users(id),
     member_id UUID REFERENCES members(id),
@@ -420,7 +421,7 @@ CREATE TABLE notifications (
 );
 
 CREATE TABLE push_tokens (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     member_id UUID REFERENCES members(id) ON DELETE CASCADE,
     device_token TEXT NOT NULL,
@@ -433,7 +434,7 @@ CREATE TABLE push_tokens (
 -- 17. REVIEWS & FEEDBACK
 -- ============================================================
 CREATE TABLE reviews (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     branch_id UUID REFERENCES branches(id),
     member_id UUID REFERENCES members(id),
     trainer_id UUID REFERENCES staff(id),
@@ -447,7 +448,7 @@ CREATE TABLE reviews (
 -- 18. AUDIT LOGS
 -- ============================================================
 CREATE TABLE audit_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id),
     action VARCHAR(100) NOT NULL,      -- CREATE, UPDATE, DELETE
     table_name VARCHAR(100) NOT NULL,
@@ -463,7 +464,7 @@ CREATE TABLE audit_logs (
 -- 19. AI LOGS (audit every AI-generated suggestion)
 -- ============================================================
 CREATE TABLE ai_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     feature VARCHAR(100) NOT NULL,     -- chatbot, churn_prediction, workout_gen, etc.
     input_data JSONB,
     output_data JSONB,
@@ -479,7 +480,7 @@ CREATE TABLE ai_logs (
 -- 20. SETTINGS
 -- ============================================================
 CREATE TABLE settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     gym_id UUID REFERENCES gyms(id) ON DELETE CASCADE,
     key VARCHAR(150) NOT NULL,
     value TEXT,
