@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitZone Gyms — Sign In</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --green-light: #dcfce7;
+    --green-muted: #86efac;
+    --text: #111827;
+    --text-2: #6b7280;
+    --text-3: #9ca3af;
+    --border: #e5e7eb;
+    --bg: #f9fafb;
+    --white: #ffffff;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left {
+    width: 420px;
+    flex-shrink: 0;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .left::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; right: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(34,197,94,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .brand {
+    position: relative;
+    z-index: 1;
+  }
+  .brand-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green);
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.25);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .brand-badge::before { content: '●'; font-size: 7px; }
+
+  .stats-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 18px 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 5px;
+    font-weight: 500;
+  }
+  .stat-sub.neutral { color: rgba(255,255,255,0.35); }
+
+  .left-footer {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .form-shell {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 32px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: none;
+    background: transparent;
+  }
+  .tab.active {
+    background: var(--white);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+
+  /* Panel display */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .form-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
+  .form-sub {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 28px;
+  }
+
+  /* Form fields */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 13px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+  }
+  .field input::placeholder { color: var(--text-3); }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field-hint {
+    font-size: 11.5px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  /* Password wrapper */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 40px; }
+  .pw-toggle {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-3);
+    font-size: 13px;
+    padding: 2px;
+    line-height: 1;
+  }
+
+  /* Forgot */
+  .forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -8px;
+    margin-bottom: 16px;
+  }
+  .forgot-row a {
+    font-size: 13px;
+    color: var(--green-dark);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .forgot-row a:hover { text-decoration: underline; }
+
+  /* Primary button */
+  .btn-primary {
+    width: 100%;
+    padding: 11px;
+    background: #16a34a;
+    color: var(--white);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .btn-primary:hover { background: #15803d; }
+  .btn-primary:active { transform: scale(0.99); }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--text-3);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Google button */
+  .btn-google {
+    width: 100%;
+    padding: 10px;
+    background: var(--white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .btn-google:hover { background: var(--bg); }
+  .btn-google svg { width: 17px; height: 17px; }
+
+  /* Terms */
+  .terms {
+    font-size: 11.5px;
+    color: var(--text-3);
+    text-align: center;
+    margin-top: 18px;
+    line-height: 1.6;
+  }
+  .terms a { color: var(--green-dark); text-decoration: none; font-weight: 500; }
+  .terms a:hover { text-decoration: underline; }
+
+  /* Plan selector */
+  .plan-chips {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .plan-chip {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--white);
+  }
+  .plan-chip:hover { border-color: var(--green-muted); }
+  .plan-chip.selected {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .plan-chip .plan-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+  }
+  .plan-chip .plan-price {
+    font-size: 10.5px;
+    color: var(--text-2);
+    margin-top: 2px;
+    display: block;
+  }
+  .plan-chip.selected .plan-name { color: var(--green-dark); }
+  .plan-chip.selected .plan-price { color: var(--green-dark); }
+  .plan-chip input { display: none; }
+
+  /* Step indicator (register) */
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 28px;
+  }
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .step-dot.done { background: var(--green); color: white; }
+  .step-dot.active { background: var(--text); color: white; }
+  .step-dot.pending { background: var(--border); color: var(--text-3); }
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .step-line.done { background: var(--green); }
+  .step-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .step-col { display: flex; flex-direction: column; align-items: center; }
+
+  /* Back button */
+  .btn-back {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-right: 10px;
+  }
+  .btn-back:hover { border-color: var(--text-3); color: var(--text); }
+
+  .btn-row { display: flex; align-items: center; margin-top: 4px; }
+  .btn-row .btn-primary { flex: 1; margin-top: 0; }
+
+  /* Alert */
+  .alert {
+    background: var(--red-light);
+    border: 1px solid #fca5a5;
+    color: var(--red);
+    padding: 10px 13px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  @media (max-width: 780px) {
+    .left { display: none; }
+    .right { padding: 32px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left">
+  <div class="brand">
+    <div class="brand-name">FitZone Gyms</div>
+    <span class="brand-badge">Starter</span>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Active Members</div>
+      <div class="stat-value">142</div>
+      <div class="stat-sub">↑ 12 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Revenue / Month</div>
+      <div class="stat-value">₹1.2L</div>
+      <div class="stat-sub">↑ 8% vs last</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Attendance Today</div>
+      <div class="stat-value">38</div>
+      <div class="stat-sub neutral">Peak: 9–11 AM</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Modules Active</div>
+      <div class="stat-value">7/27</div>
+      <div class="stat-sub neutral">Starter plan</div>
+    </div>
+  </div>
+
+  <div class="left-footer">© 2026 FitZone Gyms. All rights reserved.</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right">
+  <div class="form-shell">
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div id="login-panel" class="panel active">
+      <div class="form-heading">Welcome back</div>
+      <div class="form-sub">Sign in to your gym admin dashboard</div>
+
+      <div class="alert" id="login-alert">Invalid email or password. Please try again.</div>
+
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="admin@fitzonegyms.com">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-pw" placeholder="Enter your password">
+          <button class="pw-toggle" onclick="togglePw('login-pw', this)">Show</button>
+        </div>
+      </div>
+
+      <div class="forgot-row">
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button class="btn-primary" onclick="fakeLoginError()">Sign in</button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="btn-google">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.8 33.4 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4.5 24 4.5 12.7 4.5 3.5 13.7 3.5 25S12.7 45.5 24 45.5 44.5 36.3 44.5 25c0-1.7-.2-3.4-.9-5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 19 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4.5 24 4.5c-7.7 0-14.3 4.4-17.7 10.2z"/><path fill="#4CAF50" d="M24 45.5c5.2 0 9.9-1.9 13.5-5.1l-6.2-5.3C29.3 36.8 26.8 37.5 24 37.5c-5.3 0-9.8-3.5-11.4-8.4l-6.6 5.1C9.5 41.1 16.3 45.5 24 45.5z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.3C40.7 36 44.5 31 44.5 25c0-1.7-.2-3.4-.9-5z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="terms">
+        Don't have an account? <a href="#" onclick="switchTab('register'); return false;">Register your gym</a>
+      </div>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div id="register-panel" class="panel">
+      <!-- Step indicator -->
+      <div style="margin-bottom: 28px;">
+        <div class="steps" id="steps-row">
+          <div class="step-col">
+            <div class="step-dot active" id="dot-1">1</div>
+            <div class="step-label">Gym Info</div>
+          </div>
+          <div class="step-line" id="line-1"></div>
+          <div class="step-col">
+            <div class="step-dot pending" id="dot-2">2</div>
+            <div class="step-label">Plan</div>
+          </div>
+          <div class="step-line" id="line-2"></div>
+          <div class="step-col">
+            <div class="step-dot pending" id="dot-3">3</div>
+            <div class="step-label">Account</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Gym Info -->
+      <div id="step-1">
+        <div class="form-heading">Set up your gym</div>
+        <div class="form-sub">Tell us about your fitness business</div>
+
+        <div class="field">
+          <label>Gym name</label>
+          <input type="text" placeholder="e.g. FitZone Koramangala">
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>City</label>
+            <input type="text" placeholder="Chennai">
+          </div>
+          <div class="field">
+            <label>State</label>
+            <select>
+              <option value="">Select state</option>
+              <option>Tamil Nadu</option>
+              <option>Karnataka</option>
+              <option>Maharashtra</option>
+              <option>Delhi</option>
+              <option>Telangana</option>
+              <option>Kerala</option>
+              <option>Gujarat</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Phone number</label>
+          <input type="tel" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="field">
+          <label>Current member count (approx.)</label>
+          <select>
+            <option value="">Select range</option>
+            <option>1–50 members</option>
+            <option>51–150 members</option>
+            <option>151–500 members</option>
+            <option>500+ members</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+      </div>
+
+      <!-- Step 2: Plan -->
+      <div id="step-2" style="display:none;">
+        <div class="form-heading">Choose your plan</div>
+        <div class="form-sub">Start free, upgrade as you grow</div>
+
+        <div class="plan-chips" id="plan-chips">
+          <label class="plan-chip selected">
+            <input type="radio" name="plan" value="starter" checked>
+            <span class="plan-name">Starter</span>
+            <span class="plan-price">Free</span>
+          </label>
+          <label class="plan-chip">
+            <input type="radio" name="plan" value="growth">
+            <span class="plan-name">Growth</span>
+            <span class="plan-price">₹2,499/mo</span>
+          </label>
+          <label class="plan-chip">
+            <input type="radio" name="plan" value="pro">
+            <span class="plan-name">Pro</span>
+            <span class="plan-price">₹5,999/mo</span>
+          </label>
+          <label class="plan-chip">
+            <input type="radio" name="plan" value="enterprise">
+            <span class="plan-name">Enterprise</span>
+            <span class="plan-price">Custom</span>
+          </label>
+        </div>
+
+        <div class="field" style="background:var(--green-light); border: 1.5px solid #bbf7d0; border-radius:10px; padding:14px 16px; margin-bottom: 16px;">
+          <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:6px;">Starter — Free forever</div>
+          <div style="font-size:12.5px; color:#15803d; line-height:1.7;">
+            ✓ Dashboard, Attendance, Achievements<br>
+            ✓ Members, Membership Plans, Payments<br>
+            ✓ Settings — 7 of 27 modules
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(1)">← Back</button>
+          <button class="btn-primary" onclick="goStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Account -->
+      <div id="step-3" style="display:none;">
+        <div class="form-heading">Create your account</div>
+        <div class="form-sub">You'll use this to log into the admin panel</div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" placeholder="Jyothi">
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" placeholder="Prakash">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Work email</label>
+          <input type="email" placeholder="admin@fitzonegyms.com">
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="reg-pw" placeholder="At least 8 characters">
+            <button class="pw-toggle" onclick="togglePw('reg-pw', this)">Show</button>
+          </div>
+          <div class="field-hint">Use letters, numbers, and a symbol for a stronger password.</div>
+        </div>
+
+        <div class="field">
+          <label>Confirm password</label>
+          <div class="pw-wrap">
+            <input type="password" id="reg-pw2" placeholder="Repeat password">
+            <button class="pw-toggle" onclick="togglePw('reg-pw2', this)">Show</button>
+          </div>
+        </div>
+
+<div class="btn-row">
+  <button class="btn-back" onclick="goStep(2)">← Back</button>
+  <button class="btn-primary" onclick="this.textContent='Creating account…'; setTimeout(()=>{this.textContent='✓ Account created!'; this.style.background='#15803d';},1200)">
+    Create account
+  </button>
+</div>
+
+
+        <div class="terms">
+          By registering you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    if (tab === 'login') {
+      document.querySelectorAll('.tab')[0].classList.add('active');
+      document.getElementById('login-panel').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.getElementById('register-panel').classList.add('active');
+    }
+  }
+
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+    else { inp.type = 'password'; btn.textContent = 'Show'; }
+  }
+
+  function goStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('step-'+i).style.display = (i===n) ? '' : 'none';
+    });
+    updateStepUI(n);
+  }
+
+  function updateStepUI(active) {
+    [1,2,3].forEach(i => {
+      const dot = document.getElementById('dot-'+i);
+      dot.className = 'step-dot ' + (i < active ? 'done' : i === active ? 'active' : 'pending');
+      dot.textContent = i < active ? '✓' : i;
+    });
+    [1,2].forEach(i => {
+      const line = document.getElementById('line-'+i);
+      line.className = 'step-line ' + (i < active ? 'done' : '');
+    });
+  }
+
+  // Plan chip selection
+  document.querySelectorAll('.plan-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.plan-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      const planInfo = {
+        starter: { name:'Starter — Free forever', modules:'✓ Dashboard, Attendance, Achievements<br>✓ Members, Membership Plans, Payments<br>✓ Settings — 7 of 27 modules' },
+        growth:  { name:'Growth — ₹2,499/mo', modules:'✓ Everything in Starter<br>✓ Staff, Expenses, Face & Fingerprint<br>✓ Billing & Invoices, Reviews — 16 of 27 modules' },
+        pro:     { name:'Pro — ₹5,999/mo', modules:'✓ Everything in Growth<br>✓ Leads / CRM, Reports, Equipment<br>✓ AI Support Chatbot, Churn Prediction — 24 of 27 modules' },
+        enterprise: { name:'Enterprise — Custom pricing', modules:'✓ All 27 modules<br>✓ Dedicated account manager<br>✓ Custom integrations & SLA' }
+      };
+      const val = chip.querySelector('input').value;
+      const info = planInfo[val];
+      const box = chip.closest('.panel').querySelector('.field[style*="background"]');
+      box.querySelector('div:first-child').textContent = info.name;
+      box.querySelector('div:last-child').innerHTML = info.modules;
+    });
+  });
+
+  function fakeLoginError() {
+    const alert = document.getElementById('login-alert');
+    alert.style.display = 'block';
+  }
+</script>
+</body>
+</html>
